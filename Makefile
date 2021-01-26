@@ -1,4 +1,4 @@
-.PHONY: all build ami
+.PHONY: all build run-ami ami
 
 all:
 	@make ami
@@ -42,3 +42,7 @@ build:
 	cmake -S src -B build
 	cd build && $(MAKE)
 	@ln -s build/GalleryGenerator . && echo "\nA simbolic link to GalleryGenerator has been created in the project directory."
+
+run-ami:
+	@make build > /dev/null
+	@./build/GalleryGenerator datasets/AMI/

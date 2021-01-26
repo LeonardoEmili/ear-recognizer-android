@@ -137,17 +137,17 @@ dmypy.json
 # Code settings
 .vscode
 
-# Extracted datasets
-datasets/*
-datasets/fasttext/*
-datasets/twitter.csv
-!datasets/reddit.csv
-datasets/training.1600000.processed.noemoticon.csv
-datasets/imdb.csv
-
-# latex
-report/**
-!report/modules
-!*.bib
-!*.pdf
-!*.tex
+# CMake files
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+# Soft link to binary file
+GalleryGenerator

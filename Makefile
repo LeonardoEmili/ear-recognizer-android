@@ -1,5 +1,8 @@
 .PHONY: all build run-ami ami
 
+# Default haarcascades installation path, provide a custom value with OPENCV_SAMPLES_DATA_PATH=<custom_path> if different
+export OPENCV_SAMPLES_DATA_PATH=${HOME}/opencv/data/haarcascades/
+
 all:
 	@make ami
 	@make build

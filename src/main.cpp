@@ -6,11 +6,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include "opencv2/imgproc.hpp"
 #include <opencv2/objdetect.hpp>
+#include <opencv2/core/utility.hpp>
 
 using namespace cv;
 using namespace std;
-
-CascadeClassifier ear_cascade;
+using namespace samples;
 
 /**
  * Execute a command a return the result.
@@ -59,7 +59,7 @@ vector<string> readDataset(char *path)
 }
 
 
-void detectAndDisplay( Mat frame ) {
+void detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
     Mat frame_gray;
     cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
@@ -67,7 +67,7 @@ void detectAndDisplay( Mat frame ) {
 
     Mat croppedEar(frame);
     std::vector<Rect> faces;
-    ear_cascade.detectMultiScale( frame_gray, faces );
+    cascade.detectMultiScale( frame_gray, faces );
     for ( size_t i = 0; i < faces.size(); i++ ) {
         Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
         //rectangle(frame, faces[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
@@ -100,11 +100,18 @@ int main(int argc, char **argv) {
 
     vector<string> imageNames = readDataset(argv[1]);
 
-    // String eyes_cascade_name = samples::findFile(parser.get<String>("eyes_cascade") ); // check if this simplifies haar classifier model retrival
+    String leftEarCascadeName = findFile("haarcascade_mcs_leftear.xml");
+    String rightEarCascadeName = findFile("haarcascade_mcs_rightear.xml");
 
-    if (!ear_cascade.load("/Users/leonardoemili/opencv/data/haarcascades/"
-                          "haarcascade_mcs_leftear.xml")) {
-        cout << "--(!)Error loading face cascade\n";
+    CascadeClassifier leftEarCascade;
+    CascadeClassifier rightEarCascade;
+
+    if (!leftEarCascade.load(leftEarCascadeName)) {
+        cout << "--(!)Error loading left ear cascade\n";
+        return -1;
+    };
+    if (!rightEarCascade.load(rightEarCascadeName)) {
+        cout << "--(!)Error loading right ear cascade\n";
         return -1;
     };
 
@@ -122,9 +129,9 @@ int main(int argc, char **argv) {
             return -1;
         }
 
-        detectAndDisplay(image);
+        detectAndDisplay(image, leftEarCascade);
 
-        return 0;
+        
 
     }
 

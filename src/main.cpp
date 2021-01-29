@@ -8,56 +8,12 @@
 #include <opencv2/objdetect.hpp>
 #include <opencv2/core/utility.hpp>
 
+#include "localization.hpp"
+#include "utility.hpp"
+
 using namespace cv;
 using namespace std;
 using namespace samples;
-
-/**
- * Execute a command a return the result.
- * @param cmd is the command to be executed
- * @return the output of the command
- */
-string exec(const char *cmd) {
-    array<char, 128> buffer;
-    string result;
-    unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-    if (!pipe)
-    {
-        throw runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
-    {
-        result += buffer.data();
-    }
-    return result;
-}
-
-/**
- * Read a dataset and return the list of images.
- * @param path where the dataset is located
- * @param outArray the list of images returned as an array
- */
-vector<string> readDataset(char *path)
-{
-    vector<string> fnames;
-    if (DIR *dir = opendir(path))
-    {
-        int i = 0;
-        while (struct dirent *entry = readdir(dir)) {
-            // Skip special directories
-            if (strcmp(entry->d_name, ".") == 0)
-                continue;
-            if (strcmp(entry->d_name, "..") == 0)
-                continue;
-            if (entry->d_name[0] == '.')
-                continue;
-
-            fnames.push_back(entry->d_name);
-        }
-    }
-    return fnames;
-}
-
 
 int detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
     Mat frame_gray;
@@ -80,22 +36,11 @@ int detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
     return ears.size();
 }
 
-/**
- * Run 'wc -l' to see the size of the dataset.
- * @param path the path to the dataset
- * @return the size of the dataset
- */
-int getDatasetSize(char* path) {
-    ostringstream cmd;
-    cmd << "ls -l1 " << path << " | wc -l";
-    return stoi(exec(cmd.str().c_str()));
-}
-
 int main(int argc, char **argv) {
     if (argc != 2) {
         cout << " Usage: " << argv[0] << " path to dataset" << endl;
         return -1;
-    }    
+    }
 
     int datasetSize = getDatasetSize(argv[1]);
 
@@ -110,14 +55,8 @@ int main(int argc, char **argv) {
     CascadeClassifier leftEarCascade;
     CascadeClassifier rightEarCascade;
 
-    if (!leftEarCascade.load(leftEarCascadeName)) {
-        cout << "--(!)Error loading left ear cascade\n";
-        return -1;
-    };
-    if (!rightEarCascade.load(rightEarCascadeName)) {
-        cout << "--(!)Error loading right ear cascade\n";
-        return -1;
-    };
+    initializeCascade(leftEarCascade, leftEarCascadeName);
+    initializeCascade(rightEarCascade, rightEarCascadeName);
 
     for (String imageName: imageNames) {
 

@@ -1,8 +1,6 @@
 #include <iostream>
 #include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <dirent.h>
+#include <opencv2/objdetect.hpp>
 
 using namespace cv;
 using namespace std;
@@ -14,3 +12,5 @@ using namespace std;
 void crop_ears();
 
 void localize_ear();
+
+void initializeCascade(CascadeClassifier&, String);

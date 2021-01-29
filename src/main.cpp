@@ -37,8 +37,9 @@ string exec(const char *cmd) {
  * @param path where the dataset is located
  * @param outArray the list of images returned as an array
  */
-void readDataset(char *path, char **outArray)
+vector<string> readDataset(char *path)
 {
+    vector<string> fnames;
     if (DIR *dir = opendir(path))
     {
         int i = 0;
@@ -51,10 +52,10 @@ void readDataset(char *path, char **outArray)
             if (entry->d_name[0] == '.')
                 continue;
 
-            outArray[i++] = entry->d_name;
-            //cout << outArray[i-1] << '\n';
+            fnames.push_back(entry->d_name);
         }
     }
+    return fnames;
 }
 
 
@@ -69,8 +70,7 @@ void detectAndDisplay( Mat frame ) {
     ear_cascade.detectMultiScale( frame_gray, faces );
     for ( size_t i = 0; i < faces.size(); i++ ) {
         Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
-        //ellipse( frame, center, Size( faces[i].width/2, faces[i].height/2 ), 0, 0, 360, Scalar( 255, 0, 255 ), 4 );
-        //rectangle(frame, faces[i], Scalar( 255, 0, 255 ), 4);
+        //rectangle(frame, faces[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
         croppedEar = croppedEar(faces[i]);
     }
     //-- Show what you got
@@ -79,23 +79,28 @@ void detectAndDisplay( Mat frame ) {
     waitKey(0);                       // Wait for a keystroke in the window
 }
 
+/**
+ * Run 'wc -l' to see the size of the dataset.
+ * @param path the path to the dataset
+ * @return the size of the dataset
+ */
+int getDatasetSize(char* path) {
+    ostringstream cmd;
+    cmd << "ls -l1 " << path << " | wc -l";
+    return stoi(exec(cmd.str().c_str()));
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         cout << " Usage: " << argv[0] << " path to dataset" << endl;
         return -1;
-    }
+    }    
 
-    // Run 'wc -l' to see the size of the dataset
-    ostringstream cmd;
-    cmd << "ls -l1 " << argv[1] << " | wc -l";
+    int datasetSize = getDatasetSize(argv[1]);
 
-    int datasetSize = stoi(exec(cmd.str().c_str()));
-    char *inputImages[datasetSize];
+    vector<string> imageNames = readDataset(argv[1]);
 
-    readDataset(argv[1], inputImages);
-
-    // String eyes_cascade_name = samples::findFile(
-    // parser.get<String>("eyes_cascade") );
+    // String eyes_cascade_name = samples::findFile(parser.get<String>("eyes_cascade") ); // check if this simplifies haar classifier model retrival
 
     if (!ear_cascade.load("/Users/leonardoemili/opencv/data/haarcascades/"
                           "haarcascade_mcs_leftear.xml")) {
@@ -103,12 +108,11 @@ int main(int argc, char **argv) {
         return -1;
     };
 
-    for (char *e : inputImages) {
-        // Apply whatever processing to images here
-        // e is a the filename of each picture
+    for (String imageName: imageNames) {
 
         ostringstream imgPath;
-        imgPath << argv[1] << "4.jpeg";
+        imgPath << argv[1] << imageName;
+        cout << imgPath.str();  // debug
 
         Mat image;
         image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file

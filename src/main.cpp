@@ -21,10 +21,12 @@ string exec(const char *cmd) {
     array<char, 128> buffer;
     string result;
     unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-    if (!pipe) {
+    if (!pipe)
+    {
         throw runtime_error("popen() failed!");
     }
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
+    {
         result += buffer.data();
     }
     return result;
@@ -35,14 +37,19 @@ string exec(const char *cmd) {
  * @param path where the dataset is located
  * @param outArray the list of images returned as an array
  */
-void readDataset(char *path, char **outArray) {
-    if (DIR *dir = opendir(path)) {
+void readDataset(char *path, char **outArray)
+{
+    if (DIR *dir = opendir(path))
+    {
         int i = 0;
         while (struct dirent *entry = readdir(dir)) {
             // Skip special directories
-            if (strcmp(entry->d_name, ".") == 0) continue;
-            if (strcmp(entry->d_name, "..") == 0) continue;
-            if (entry->d_name[0] == '.') continue;
+            if (strcmp(entry->d_name, ".") == 0)
+                continue;
+            if (strcmp(entry->d_name, "..") == 0)
+                continue;
+            if (entry->d_name[0] == '.')
+                continue;
 
             outArray[i++] = entry->d_name;
             //cout << outArray[i-1] << '\n';

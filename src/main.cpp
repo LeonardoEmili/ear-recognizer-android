@@ -100,8 +100,10 @@ int main(int argc, char **argv) {
 
     vector<string> imageNames = readDataset(argv[1]);
 
+    freopen("NUL", "w", stderr);
     String leftEarCascadeName = findFile("haarcascade_mcs_leftear.xml");
     String rightEarCascadeName = findFile("haarcascade_mcs_rightear.xml");
+    freopen("CON", "w", stderr);
 
     CascadeClassifier leftEarCascade;
     CascadeClassifier rightEarCascade;

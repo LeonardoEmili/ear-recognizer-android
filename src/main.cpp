@@ -59,24 +59,25 @@ vector<string> readDataset(char *path)
 }
 
 
-void detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
+int detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
     Mat frame_gray;
     cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
-    //-- Detect faces
 
     Mat croppedEar(frame);
-    std::vector<Rect> faces;
-    cascade.detectMultiScale( frame_gray, faces );
-    for ( size_t i = 0; i < faces.size(); i++ ) {
-        Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
-        //rectangle(frame, faces[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
-        croppedEar = croppedEar(faces[i]);
+    std::vector<Rect> ears;
+    cascade.detectMultiScale( frame_gray, ears );
+    for ( size_t i = 0; i < ears.size(); i++ ) {
+        //rectangle(frame, ears[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
+        croppedEar = croppedEar(ears[i]);
     }
-    //-- Show what you got
-    imshow( "Capture - Face detection", croppedEar );
+    cout << ears.size() << "\n" << flush;;
 
-    waitKey(0);                       // Wait for a keystroke in the window
+    imshow( "Ear detection", croppedEar );
+    waitKey(0);
+    destroyAllWindows();
+    
+    return ears.size();
 }
 
 /**
@@ -100,10 +101,11 @@ int main(int argc, char **argv) {
 
     vector<string> imageNames = readDataset(argv[1]);
 
-    freopen("NUL", "w", stderr);
+    // Function findFile always reminds us where it found these files, just annoying to see
+    freopen("/dev/null", "w", stderr);
     String leftEarCascadeName = findFile("haarcascade_mcs_leftear.xml");
     String rightEarCascadeName = findFile("haarcascade_mcs_rightear.xml");
-    freopen("CON", "w", stderr);
+    freopen("/dev/null", "w", stderr);
 
     CascadeClassifier leftEarCascade;
     CascadeClassifier rightEarCascade;
@@ -121,18 +123,20 @@ int main(int argc, char **argv) {
 
         ostringstream imgPath;
         imgPath << argv[1] << imageName;
-        cout << imgPath.str();  // debug
 
-        Mat image;
-        image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file
+        Mat image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file
 
         if (image.empty()) {  // Check for invalid input
             cout << "Could not open or find the image" << std::endl;
             return -1;
         }
 
-        detectAndDisplay(image, leftEarCascade);
-
+        if (detectAndDisplay(image, leftEarCascade) == 0) {
+            cout << "Right ear found !\n" << endl;
+            detectAndDisplay(image, rightEarCascade);
+        } else {
+            cout << "Left ear found !\n" << endl;
+        }
         
 
     }

@@ -18,14 +18,17 @@ using namespace samples;
 int detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
     Mat frame_gray;
     cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
-    equalizeHist( frame_gray, frame_gray );
+    //equalizeHist( frame_gray, frame_gray );
 
     Mat croppedEar(frame);
     std::vector<Rect> ears;
     cascade.detectMultiScale( frame_gray, ears );
-    for ( size_t i = 0; i < ears.size(); i++ ) {
+    for (Rect ear : ears) {
         //rectangle(frame, ears[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
-        croppedEar = croppedEar(ears[i]);
+        if ( !isValidROI(ear, croppedEar) ) {
+            return 0;
+        }
+        croppedEar = croppedEar(ear);
     }
     cout << ears.size() << "\n" << flush;;
 

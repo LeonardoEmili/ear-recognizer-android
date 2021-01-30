@@ -14,3 +14,5 @@ void crop_ears();
 void localize_ear();
 
 void initializeCascade(CascadeClassifier&, String);
+
+bool isValidROI(Rect, Mat);

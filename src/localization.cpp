@@ -1,5 +1,7 @@
 #include "localization.hpp"
 
+#define CROPPED_PATH "generated/cropped/"
+
 void initializeCascade(CascadeClassifier &cascade, String name)
 {
     if (!cascade.load(name))
@@ -46,7 +48,7 @@ int cropAndFlipImages(char *datasetPath)
         }
         n_visited++;
         // Checking left ear
-        if (detectImage(image, leftEarCascade, display_images) > 0)
+        if (detectImage(image, leftEarCascade, false, display_images, imageName) > 0)
         {
             n_detected++;
             cout << "Left ear found !\n"
@@ -55,7 +57,7 @@ int cropAndFlipImages(char *datasetPath)
         else
         {
             // Checking right ear
-            if (detectImage(image, rightEarCascade, display_images) > 0)
+            if (detectImage(image, rightEarCascade, true, display_images, imageName) > 0)
             {
                 n_detected++;
                 cout << "Right ear found !\n"
@@ -68,7 +70,7 @@ int cropAndFlipImages(char *datasetPath)
                 Mat flipped;
                 flip(image, flipped, 1);
                 // Checking left ear
-                if (detectImage(flipped, leftEarCascade, display_images) > 0)
+                if (detectImage(flipped, leftEarCascade, false, display_images, imageName) > 0)
                 {
                     n_detected++;
                     cout << "Left ear found !\n"
@@ -77,7 +79,7 @@ int cropAndFlipImages(char *datasetPath)
                 else
                 {
                     // Checking right ear
-                    if (detectImage(flipped, rightEarCascade, display_images) > 0)
+                    if (detectImage(flipped, rightEarCascade, true, display_images, imageName) > 0)
                     {
                         n_detected++;
                         cout << "Right ear found !\n"
@@ -99,7 +101,8 @@ bool isValidROI(Rect BBox, Mat originalFrame)
     return (BBox.x >= 0 && BBox.y >= 0 && BBox.width >= 0 && BBox.height >= 0 && BBox.x + BBox.width <= originalFrame.cols && BBox.y + BBox.height <= originalFrame.rows);
 }
 
-int detectImage(Mat frame, CascadeClassifier &cascade, bool display)
+int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
+                bool display, String imageName)
 {
     Mat frame_gray;
     cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
@@ -119,7 +122,22 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool display)
     }
     cout << ears.size() << "\n"
          << flush;
-    ;
+
+    // Saving cropped (and in case flipped) image as output
+    if (ears.size() > 0)
+    {
+        Mat outputImg = croppedEar;
+        // Flipping if ear is the right one. We only keep left ears for recognition
+        if (rightClassifier)
+        {
+            flip(croppedEar, outputImg, 1);
+        }
+        String outputPath = CROPPED_PATH + imageName;
+        cv::utils::fs::createDirectories(CROPPED_PATH);
+        imwrite(outputPath, outputImg);
+    }
+
+    //Displaying image
     if (display)
     {
         displayDetected(croppedEar);

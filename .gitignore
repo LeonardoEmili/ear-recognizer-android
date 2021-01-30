@@ -330,3 +330,6 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+
+# Other
+generated/

@@ -7,6 +7,7 @@
 #include "opencv2/imgproc.hpp"
 #include <opencv2/objdetect.hpp>
 #include <opencv2/core/utility.hpp>
+#include <opencv2/core/utils/filesystem.hpp>
 
 #include "utility.hpp"
 
@@ -22,4 +23,5 @@ bool isValidROI(Rect, Mat);
 
 void displayDetected(Mat croppedEar);
 
-int detectImage(Mat frame, CascadeClassifier &cascade, bool display);
+int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
+                bool display, String imageName);

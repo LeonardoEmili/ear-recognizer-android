@@ -74,6 +74,9 @@ int main(int argc, char **argv)
     initializeCascade(leftEarCascade, leftEarCascadeName);
     initializeCascade(rightEarCascade, rightEarCascadeName);
 
+    double n_detected = 0.0;
+    double n_visited = 0.0;
+
     for (String imageName : imageNames)
     {
 
@@ -87,23 +90,52 @@ int main(int argc, char **argv)
             cout << "Could not open or find the image" << std::endl;
             return -1;
         }
-
+        n_visited++;
         // Checking left ear
-        if (detect(image, leftEarCascade, false) == 0)
+        if (detect(image, leftEarCascade, false) > 0)
+        {
+            n_detected++;
+            cout << "Left ear found !\n"
+                 << endl;
+        }
+        else
         {
             // Checking right ear
             if (detect(image, rightEarCascade, false) > 0)
             {
+                n_detected++;
                 cout << "Right ear found !\n"
                      << endl;
             }
-        }
-        else
-        {
-            cout << "Left ear found !\n"
-                 << endl;
+            else
+            {
+                /* Trying to flip the given image horizontally and interpet it  
+                    as the opposite ear*/
+                Mat flipped;
+                flip(image, flipped, 1);
+                // Checking left ear
+                if (detect(flipped, leftEarCascade, false) > 0)
+                {
+                    n_detected++;
+                    cout << "Left ear found !\n"
+                         << endl;
+                }
+                else
+                {
+                    // Checking right ear
+                    if (detect(flipped, rightEarCascade, false) > 0)
+                    {
+                        n_detected++;
+                        cout << "Right ear found !\n"
+                             << endl;
+                    }
+                }
+            }
         }
     }
+
+    cout << "Detection rate ";
+    printf("%f\n", n_detected / n_visited);
 
     return 0;
 }

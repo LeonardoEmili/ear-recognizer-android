@@ -15,32 +15,45 @@ using namespace cv;
 using namespace std;
 using namespace samples;
 
-int detectAndDisplay( Mat frame, CascadeClassifier& cascade) {
+void displayDetected(Mat croppedEar)
+{
+    imshow("Ear detection", croppedEar);
+    waitKey(0);
+    destroyAllWindows();
+}
+
+int detect(Mat frame, CascadeClassifier &cascade, bool display)
+{
     Mat frame_gray;
-    cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
+    cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
     //equalizeHist( frame_gray, frame_gray );
 
     Mat croppedEar(frame);
     std::vector<Rect> ears;
-    cascade.detectMultiScale( frame_gray, ears );
-    for (Rect ear : ears) {
+    cascade.detectMultiScale(frame_gray, ears);
+    for (Rect ear : ears)
+    {
         //rectangle(frame, ears[i], Scalar( 255, 0, 255 ), 4); // display a rectangle
-        if ( !isValidROI(ear, croppedEar) ) {
+        if (!isValidROI(ear, croppedEar))
+        {
             return 0;
         }
         croppedEar = croppedEar(ear);
     }
-    cout << ears.size() << "\n" << flush;;
-
-    imshow( "Ear detection", croppedEar );
-    waitKey(0);
-    destroyAllWindows();
-    
+    cout << ears.size() << "\n"
+         << flush;
+    ;
+    if (display)
+    {
+        displayDetected(croppedEar);
+    }
     return ears.size();
 }
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
+int main(int argc, char **argv)
+{
+    if (argc != 2)
+    {
         cout << " Usage: " << argv[0] << " path to dataset" << endl;
         return -1;
     }
@@ -61,26 +74,35 @@ int main(int argc, char **argv) {
     initializeCascade(leftEarCascade, leftEarCascadeName);
     initializeCascade(rightEarCascade, rightEarCascadeName);
 
-    for (String imageName: imageNames) {
+    for (String imageName : imageNames)
+    {
 
         ostringstream imgPath;
         imgPath << argv[1] << imageName;
 
-        Mat image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file
+        Mat image = imread(imgPath.str(), IMREAD_COLOR); // Read the file
 
-        if (image.empty()) {  // Check for invalid input
+        if (image.empty())
+        { // Check for invalid input
             cout << "Could not open or find the image" << std::endl;
             return -1;
         }
 
-        if (detectAndDisplay(image, leftEarCascade) == 0) {
-            cout << "Right ear found !\n" << endl;
-            detectAndDisplay(image, rightEarCascade);
-        } else {
-            cout << "Left ear found !\n" << endl;
+        // Checking left ear
+        if (detect(image, leftEarCascade, false) == 0)
+        {
+            // Checking right ear
+            if (detect(image, rightEarCascade, false) > 0)
+            {
+                cout << "Right ear found !\n"
+                     << endl;
+            }
         }
-        
-
+        else
+        {
+            cout << "Left ear found !\n"
+                 << endl;
+        }
     }
 
     return 0;

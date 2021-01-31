@@ -333,3 +333,6 @@ lint/tmp/
 
 # Other
 generated/
+
+# Tensorflow models
+*.pb

@@ -94,7 +94,7 @@ bool isValidROI(Rect BBox, Mat originalFrame) {
 
 int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
                 bool display, String imageName) {
-    Mat frameGray, resized, outputImg;
+    Mat frameGray, resized;
     cvtColor(frame, frameGray, COLOR_BGR2GRAY);
     // equalizeHist( frameGray, frameGray );
 
@@ -117,13 +117,13 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
         }
 
         croppedEar = croppedEar(ear);
-
+        Mat outputImg = croppedEar;
         // Flipping if ear is the right one. We only keep left ears for
         // recognition
         if (rightClassifier) {
             flip(croppedEar, outputImg, 1);
         }
-        resize(croppedEar, resized, Size(outputSize, outputSize));
+        resize(outputImg, resized, Size(outputSize, outputSize));
 
         writeToFile(imageName, CROPPED_PATH, resized, i);
 

@@ -3,14 +3,21 @@
 #define CROPPED_PATH "generated/cropped/"
 #define LANDMARK_PATH "generated/landmark/"
 
-void initializeCascade(CascadeClassifier &cascade, String name) {
-    if (!cascade.load(name)) {
+void initializeCascade(CascadeClassifier &cascade, String name)
+{
+    if (!cascade.load(name))
+    {
         cout << "--(!)Error loading " << name << " cascade classifier.\n";
         exit(1);
     };
 }
 
-int cropAndFlipImages(char *datasetPath, bool debugFlag) {
+void rotate()
+{
+}
+
+int cropAndFlipImages(char *datasetPath, bool debugFlag)
+{
     // Function findFile always reminds us where it found these files, just
     // annoying to see
     freopen("/dev/null", "w", stderr);
@@ -30,44 +37,64 @@ int cropAndFlipImages(char *datasetPath, bool debugFlag) {
     bool displayImages = false;
 
     vector<string> imageNames = readDataset(datasetPath);
-    for (String imageName : imageNames) {
+    for (String imageName : imageNames)
+    {
         ostringstream imgPath;
         imgPath << datasetPath << imageName;
 
-        Mat image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file
+        Mat image = imread(imgPath.str(), IMREAD_COLOR); // Read the file
 
-        if (image.empty()) {  // Check for invalid input
+        if (image.empty())
+        { // Check for invalid input
             cout << "Could not open or find the image" << std::endl;
             return -1;
         }
         visitedNo++;
         // Checking left ear
         if (detectImage(image, leftEarCascade, false, displayImages,
-                        imageName) > 0) {
+                        imageName) > 0)
+        {
             detectedNo++;
-            if (debugFlag) cout << "Left ear found !\n" << endl;
-        } else {
+            if (debugFlag)
+                cout << "Left ear found !\n"
+                     << endl;
+        }
+        else
+        {
             // Checking right ear
             if (detectImage(image, rightEarCascade, true, displayImages,
-                            imageName) > 0) {
+                            imageName) > 0)
+            {
                 detectedNo++;
-                if (debugFlag) cout << "Right ear found !\n" << endl;
-            } else {
+                if (debugFlag)
+                    cout << "Right ear found !\n"
+                         << endl;
+            }
+            else
+            {
                 /* Trying to flip the given image horizontally and interpet it
                     as the opposite ear*/
                 Mat flipped;
                 flip(image, flipped, 1);
                 // Checking left ear
                 if (detectImage(flipped, leftEarCascade, false, displayImages,
-                                imageName) > 0) {
+                                imageName) > 0)
+                {
                     detectedNo++;
-                    if (debugFlag) cout << "Left ear found !\n" << endl;
-                } else {
+                    if (debugFlag)
+                        cout << "Left ear found !\n"
+                             << endl;
+                }
+                else
+                {
                     // Checking right ear
                     if (detectImage(flipped, rightEarCascade, true,
-                                    displayImages, imageName) > 0) {
+                                    displayImages, imageName) > 0)
+                    {
                         detectedNo++;
-                        if (debugFlag) cout << "Right ear found !\n" << endl;
+                        if (debugFlag)
+                            cout << "Right ear found !\n"
+                                 << endl;
                     }
                 }
             }
@@ -86,14 +113,16 @@ int cropAndFlipImages(char *datasetPath, bool debugFlag) {
  * @param originalFrame the original image
  * @return whether the provided BBox is a valid area in the original image.
  */
-bool isValidROI(Rect BBox, Mat originalFrame) {
+bool isValidROI(Rect BBox, Mat originalFrame)
+{
     return (BBox.x >= 0 && BBox.y >= 0 && BBox.width >= 0 && BBox.height >= 0 &&
             BBox.x + BBox.width <= originalFrame.cols &&
             BBox.y + BBox.height <= originalFrame.rows);
 }
 
 int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
-                bool display, String imageName) {
+                bool display, String imageName)
+{
     Mat frameGray, resized;
     cvtColor(frame, frameGray, COLOR_BGR2GRAY);
     // equalizeHist( frameGray, frameGray );
@@ -110,9 +139,11 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
                          }),
                ears.end());
 
-    for (int i = 0; i < ears.size(); ++i) {
+    for (int i = 0; i < ears.size(); ++i)
+    {
         Rect ear = ears[i];
-        if (!isValidROI(ear, croppedEar)) {
+        if (!isValidROI(ear, croppedEar))
+        {
             continue;
         }
 
@@ -120,7 +151,8 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
         Mat outputImg = croppedEar;
         // Flipping if ear is the right one. We only keep left ears for
         // recognition
-        if (rightClassifier) {
+        if (rightClassifier)
+        {
             flip(croppedEar, outputImg, 1);
         }
         resize(outputImg, resized, Size(outputSize, outputSize));
@@ -130,21 +162,40 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
         vector<Point2d> landmarks;
         detectLandmarks(resized, landmarks);
 
-        for (Point2d landmark : landmarks) {
+        for (Point2d landmark : landmarks)
+        {
             circle(resized, landmark, 5, Scalar(0, 0, 255), FILLED);
         }
+
+        /*
+        Vec4f line;
+        fitLine(landmarks, line, DIST_L2, 0, 0.01, 0.01);
+        printf("%f, %f\n", line[0], line[1]);
+        // vector -> radians = atan2(vy,vx)
+        // Ears tilted counter clockwise wrt vertical line -> vector of type (y = 0.381557, x = 0.924345), 
+        // radians angle of type 1.1793 (starting from left and going clockwise)
+        // Ears tilted clockwise wrt vertical line -> vector of type (y = 0.148791, x = -0.988869), 
+        // radians angle of type -1.4214 (starting from left and going clockwise)
+
+
+        cv::line(resized, Point2d(line[2] - line[0] * 90, line[3] - line[1] * 90), Point2d(line[2] + line[0] * 90, line[3] + line[1] * 90),
+                 Scalar(0, 255, 0), 10, LINE_8);
+        */
 
         writeToFile(imageName, LANDMARK_PATH, resized, i);
 
         // Displaying image
-        if (display) {
+        if (display)
+        //if (true)
+        {
             displayDetected(resized);
         }
     }
     return ears.size();
 }
 
-void displayDetected(Mat croppedEar) {
+void displayDetected(Mat croppedEar)
+{
     imshow("Ear detection", croppedEar);
     waitKey(0);
     destroyAllWindows();
@@ -167,14 +218,17 @@ void displayDetected(Mat croppedEar) {
 /* Return: none */
 /* ---------------------------------------------------------------------------------------
  */
-void detectLandmarks(Mat img, vector<Point2d> &ldmk) {
+void detectLandmarks(Mat img, vector<Point2d> &ldmk)
+{
     static bool first = true;
     static Net net;
 
-    if (first) {
+    if (first)
+    {
         first = false;
         net = readNetFromTensorflow("model-stage1.pb");
-        if (net.empty()) {
+        if (net.empty())
+        {
             cerr << "ERROR: Could not load the CNNs for landmark detection"
                  << endl
                  << flush;

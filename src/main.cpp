@@ -17,7 +17,15 @@ int f(int argc, char **argv) {
     char *datasetPath = argv[1];
     vector<string> imageNames = readDataset(datasetPath);
 
-    cropAndFlipImages(datasetPath, imageNames, true);
+    vector<vector<Rect>> ROI = cropAndFlipImages(datasetPath, imageNames, false);
+    
+    /*
+    cout << ROI.size() << endl;
+    for (auto& r : ROI) {
+        if (r.size() > 0) {
+            cout << r[0].x << " " << r[0].y << endl;
+        }
+    }*/
     return 0;
 }
 

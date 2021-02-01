@@ -10,3 +10,4 @@ vector<string> readDataset(char *);
 string exec(const char *);
 int getDatasetSize(char *);
 void writeToFile(String, String, Mat, int);
+void printProgress(double percentage);

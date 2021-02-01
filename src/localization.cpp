@@ -13,8 +13,9 @@ void initializeCascade(CascadeClassifier &cascade, String name) {
 
 void rotate() {}
 
-void cropAndFlipImages(char *datasetPath, vector<string> imageNames,
-                       bool debugFlag) {
+vector<vector<Rect>> cropAndFlipImages(char *datasetPath,
+                                       vector<string> imageNames,
+                                       bool debugFlag) {
     // Suppress findFile annoying reminder
     freopen("/dev/null", "w", stderr);
     String leftEarCascadeName = findFile("haarcascade_mcs_leftear.xml");
@@ -30,9 +31,15 @@ void cropAndFlipImages(char *datasetPath, vector<string> imageNames,
     double detectedNo = 0.0;
     double visitedNo = 0.0;
 
-    bool displayImages = false;
+    vector<vector<Rect>> ROI;
 
-    for (String imageName : imageNames) {
+    // for (String imageName : imageNames) {
+    for (int i = 0; i < imageNames.size(); i++) {
+        // if (i > 50) break;
+        String imageName = imageNames[i];
+        float progress = (float)i / (float)(imageNames.size() - 1);
+        printProgress(progress);
+
         ostringstream imgPath;
         imgPath << datasetPath << imageName;
 
@@ -45,13 +52,13 @@ void cropAndFlipImages(char *datasetPath, vector<string> imageNames,
         visitedNo++;
 
         // Checking left ear
-        if (detectROIs(image, leftCascade, false, displayImages, imageName)) {
+        if (detectROI(image, leftCascade, ROI, false, imageName)) {
             detectedNo++;
             if (debugFlag) cout << "Left ear found !\n" << endl;
             continue;
         }
         // Checking right ear
-        if (detectROIs(image, rightCascade, true, displayImages, imageName)) {
+        if (detectROI(image, rightCascade, ROI, true, imageName)) {
             detectedNo++;
             if (debugFlag) cout << "Right ear found !\n" << endl;
             continue;
@@ -62,23 +69,23 @@ void cropAndFlipImages(char *datasetPath, vector<string> imageNames,
         flip(image, flipped, 1);
 
         // Checking left (flipped) ear
-        if (detectROIs(flipped, leftCascade, false, displayImages, imageName)) {
+        if (detectROI(flipped, leftCascade, ROI, false, imageName)) {
             detectedNo++;
             if (debugFlag) cout << "Left (flipped) ear found !\n" << endl;
             continue;
         }
 
         // Checking right (flipped) ear
-        if (detectROIs(flipped, rightCascade, true, displayImages, imageName)) {
+        if (detectROI(flipped, rightCascade, ROI, true, imageName)) {
             detectedNo++;
             if (debugFlag) cout << "Right (flipped) ear found !\n" << endl;
             continue;
         }
+        ROI.push_back({});
     }
 
-    cout << "Detection rate ";
-    printf("%f\n", detectedNo / visitedNo);
-    return;
+    cout << "\nDetection rate " << (float)detectedNo / (float)visitedNo << endl;
+    return ROI;
 }
 
 /**
@@ -93,8 +100,9 @@ bool isValidROI(Rect BBox, Mat originalFrame) {
             BBox.y + BBox.height <= originalFrame.rows);
 }
 
-bool detectROIs(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
-                bool display, String imageName) {
+bool detectROI(Mat frame, CascadeClassifier &cascade, vector<vector<Rect>> &ROI,
+               bool rightClassifier, String imageName) {
+    bool display = false;  // debug flag
     Mat frameGray, resized;
     cvtColor(frame, frameGray, COLOR_BGR2GRAY);
     // equalizeHist( frameGray, frameGray );
@@ -106,16 +114,15 @@ bool detectROIs(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
     const int outputSize = 96;
     // Do not consider matching ROIs whose size is too small
     ears.erase(remove_if(ears.begin(), ears.end(),
-                         [](const Rect &ear) {
-                             return min(ear.width, ear.height) < outputSize;
+                         [&croppedEar](const Rect &ear) {
+                             return !isValidROI(ear, croppedEar) ||
+                                    min(ear.width, ear.height) < outputSize;
                          }),
                ears.end());
 
     for (int i = 0; i < ears.size(); ++i) {
         Rect ear = ears[i];
-        if (!isValidROI(ear, croppedEar)) {
-            continue;
-        }
+        // if (!isValidROI(ear, croppedEar)) {continue;}
 
         croppedEar = croppedEar(ear);
         Mat outputImg = croppedEar;
@@ -186,6 +193,9 @@ bool detectROIs(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
         {
             displayDetected(resized);
         }
+    }
+    if (ears.size() > 0) {
+        ROI.push_back(ears);
     }
     return ears.size() > 0;
 }

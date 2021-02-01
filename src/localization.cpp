@@ -2,6 +2,7 @@
 
 #define CROPPED_PATH "generated/cropped/"
 #define LANDMARK_PATH "generated/landmark/"
+#define ROTATED_PATH "generated/rotated/"
 
 void initializeCascade(CascadeClassifier &cascade, String name)
 {
@@ -159,30 +160,52 @@ int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
 
         writeToFile(imageName, CROPPED_PATH, resized, i);
 
+        // Detecting landmarks
         vector<Point2d> landmarks;
         detectLandmarks(resized, landmarks);
 
+        // Fitting line among landmark points
+        Vec4f line;
+        fitLine(landmarks, line, DIST_L2, 0, 0.01, 0.01);
+        double radians = atan2(line[1], line[0]);
+        // vector -> radians = atan2(vy,vx)
+        // Ears tilted counter clockwise wrt vertical line -> vector of type (y = 0.381557, x = 0.924345),
+        // radians angle of type 1.1793 (starting from left and going clockwise)
+        // Ears tilted clockwise wrt vertical line -> vector of type (y = 0.148791, x = -0.988869),
+        // radians angle of type -1.4214 (starting from left and going clockwise)
+        double angle = (radians >= 0 ? -1 : 1) * 90.0 + radians * (180.0 / 3.141592653589793238463);
+
+        // get rotation matrix for rotating the image around its center in pixel coordinates
+        cv::Point2f center((resized.cols - 1) / 2.0, (resized.rows - 1) / 2.0);
+        cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+        // determine bounding rectangle, center not relevant
+        cv::Rect2f bbox = cv::RotatedRect(cv::Point2f(), resized.size(), angle).boundingRect2f();
+        // adjust transformation matrix
+        rot.at<double>(0, 2) += bbox.width / 2.0 - resized.cols / 2.0;
+        rot.at<double>(1, 2) += bbox.height / 2.0 - resized.rows / 2.0;
+
+        // Rotating ear image with interpolation
+        cv::Mat rotated;
+        cv::warpAffine(resized, rotated, rot, bbox.size(), INTER_LANCZOS4, BORDER_REPLICATE);
+
+        // Drawing landmarks for displaying purposes
         for (Point2d landmark : landmarks)
         {
             circle(resized, landmark, 5, Scalar(0, 0, 255), FILLED);
         }
+        // Exporting landmark image
+        writeToFile(imageName, LANDMARK_PATH, resized, i);
+
+        // Resizing rotated image
+        resize(rotated, resized, Size(outputSize, outputSize));
+
+        // Exporting rotated image
+        writeToFile(imageName, ROTATED_PATH, resized, i);
 
         /*
-        Vec4f line;
-        fitLine(landmarks, line, DIST_L2, 0, 0.01, 0.01);
-        printf("%f, %f\n", line[0], line[1]);
-        // vector -> radians = atan2(vy,vx)
-        // Ears tilted counter clockwise wrt vertical line -> vector of type (y = 0.381557, x = 0.924345), 
-        // radians angle of type 1.1793 (starting from left and going clockwise)
-        // Ears tilted clockwise wrt vertical line -> vector of type (y = 0.148791, x = -0.988869), 
-        // radians angle of type -1.4214 (starting from left and going clockwise)
-
-
         cv::line(resized, Point2d(line[2] - line[0] * 90, line[3] - line[1] * 90), Point2d(line[2] + line[0] * 90, line[3] + line[1] * 90),
                  Scalar(0, 255, 0), 10, LINE_8);
         */
-
-        writeToFile(imageName, LANDMARK_PATH, resized, i);
 
         // Displaying image
         if (display)

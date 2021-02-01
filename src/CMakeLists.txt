@@ -4,7 +4,7 @@ PROJECT(GalleryGenerator)
 FIND_PACKAGE( OpenCV REQUIRED )
 INCLUDE_DIRECTORIES( include ${OpenCV_INCLUDE_DIRS} )
 
-SET(SOURCES main.cpp localization.cpp localization.hpp utility.cpp utility.hpp)
+SET(SOURCES main.cpp localization.cpp localization.hpp utility.cpp utility.hpp landmark_detection.hpp landmark_detection.cpp normalization.hpp normalization.cpp)
 
 ADD_EXECUTABLE(GalleryGenerator ${SOURCES})
 TARGET_LINK_LIBRARIES (GalleryGenerator ${OpenCV_LIBS})

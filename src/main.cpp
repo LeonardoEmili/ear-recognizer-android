@@ -1,8 +1,6 @@
-#include <iostream>
+#include "landmark_detection.hpp"
 #include "localization.hpp"
 #include "utility.hpp"
-
-using namespace std;
 
 /**
  * Execute the actual main function from an helper function to be able
@@ -17,15 +15,22 @@ int f(int argc, char **argv) {
     char *datasetPath = argv[1];
     vector<string> imageNames = readDataset(datasetPath);
 
-    vector<vector<Rect>> ROI = cropAndFlipImages(datasetPath, imageNames, false);
-    
-    /*
-    cout << ROI.size() << endl;
-    for (auto& r : ROI) {
-        if (r.size() > 0) {
-            cout << r[0].x << " " << r[0].y << endl;
-        }
-    }*/
+    vector<Mat> grayImages;
+    vector<vector<Rect>> ROI;
+    cout << "Detecting Regions of Interest (ROI) ..." << endl << flush;
+    detectROI(datasetPath, imageNames, grayImages, ROI, false);
+
+    cout << "Normalizing input images (cropping and resizing) ..." << endl << flush;
+    vector<vector<Mat>> processedROI;
+    cropAndResize(ROI, processedROI, imageNames, grayImages);
+
+    cout << "\n\nApplying landmark detection ..." << endl << flush;
+    vector<vector<vector<Point2d>>> landmarks;
+    detectLandmark(processedROI, landmarks, imageNames);
+
+    cout << "\n\nAuto-aligning images ..." << endl << flush;
+    alignImages(processedROI, landmarks, imageNames);
+
     return 0;
 }
 

@@ -17,7 +17,7 @@ using namespace cv::dnn;
 using namespace std;
 using namespace samples;
 
-int cropAndFlipImages(char *datasetPath, bool debugFlag = false);
+void cropAndFlipImages(char *datasetPath, vector<string> imageNames, bool debugFlag = false);
 
 void initializeCascade(CascadeClassifier &, String);
 
@@ -25,7 +25,7 @@ bool isValidROI(Rect, Mat);
 
 void displayDetected(Mat croppedEar);
 
-int detectImage(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
+bool detectROIs(Mat frame, CascadeClassifier &cascade, bool rightClassifier,
                 bool display, String imageName);
 
 void detectLandmarks(Mat img, vector<Point2d> &ldmk);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "localization.hpp"
+#include "utility.hpp"
 
 using namespace std;
 
@@ -13,11 +14,10 @@ int f(int argc, char **argv) {
         return -1;
     }
 
-    int datasetSize = getDatasetSize(argv[1]);
-
     char *datasetPath = argv[1];
+    vector<string> imageNames = readDataset(datasetPath);
 
-    cropAndFlipImages(datasetPath, true);
+    cropAndFlipImages(datasetPath, imageNames, true);
     return 0;
 }
 

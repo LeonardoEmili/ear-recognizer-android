@@ -1,4 +1,4 @@
-#include "landmark_detection.hpp"
+#include "descriptors.hpp"
 #include "localization.hpp"
 #include "utility.hpp"
 
@@ -17,18 +17,18 @@ int f(int argc, char **argv) {
 
     vector<Mat> grayImages;
     vector<vector<Rect>> ROI;
-    cout << "Detecting Regions of Interest (ROI) ..." << endl << flush;
+    cout << "Detecting Regions of Interest (ROI) ...\n" << flush;
     detectROI(datasetPath, imageNames, grayImages, ROI, false);
 
-    cout << "Normalizing input images (cropping and resizing) ..." << endl << flush;
+    cout << "Normalizing input images (cropping and resizing) ...\n" << flush;
     vector<vector<Mat>> processedROI;
     cropAndResize(ROI, processedROI, imageNames, grayImages);
 
-    cout << "\n\nApplying landmark detection ..." << endl << flush;
+    cout << "\n\nApplying landmark detection ...\n" << flush;
     vector<vector<vector<Point2d>>> landmarks;
     detectLandmark(processedROI, landmarks, imageNames);
 
-    cout << "\n\nAuto-aligning images ..." << endl << flush;
+    cout << "\n\nAuto-aligning images ...\n" << flush;
     alignImages(processedROI, landmarks, imageNames);
 
     return 0;

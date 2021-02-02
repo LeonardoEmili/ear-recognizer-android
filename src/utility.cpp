@@ -3,12 +3,29 @@
 #define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
 #define PBWIDTH 60
 
-void printProgress(double percentage) {
+static chrono::steady_clock::time_point START_TIMER;
+void printProgress(int iteration, int total) {
+    if (iteration == 0) START_TIMER = getCurrentTime();
+    double percentage = (float)iteration / (float)(total - 1);
     int val = (int)(percentage * 100);
     int lpad = (int)(percentage * PBWIDTH);
     int rpad = PBWIDTH - lpad;
-    printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
+    auto end = getCurrentTime();
+    double elapsed = getElapsedSeconds(START_TIMER, end);
+    printf("\r%3d%% [%.*s%*s] %.1fs", val, lpad, PBSTR, rpad, "", elapsed);
+    if (iteration == total - 1) printf("\n");
     fflush(stdout);
+}
+
+chrono::steady_clock::time_point getCurrentTime() {
+    return chrono::steady_clock::now();
+}
+
+float getElapsedSeconds(chrono::steady_clock::time_point start,
+                        chrono::steady_clock::time_point end) {
+    return chrono::duration_cast<std::chrono::microseconds>(end - start)
+               .count() /
+           (float)(1000 * 1000);
 }
 
 /**
@@ -84,6 +101,8 @@ void displayImage(Mat image, String imageName) {
     waitKey(0);
     destroyAllWindows();
 }
+
+bool startsWith(String s, String prefix) { return s.rfind(prefix, 0) == 0; }
 
 /*
 int detectImageAndDrawLine(Mat frame, CascadeClassifier &cascade, bool

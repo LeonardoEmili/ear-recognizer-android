@@ -4,8 +4,7 @@ void cropAndResize(vector<vector<Rect>> &ROI, vector<vector<Mat>> &outputImages,
                    vector<string> imageNames, vector<Mat> grayImages,
                    int outputSize) {
     for (int j = 0; j < ROI.size(); ++j) {
-        float progress = (float)j / (float)(ROI.size() - 1);
-        printProgress(progress);
+        printProgress(j, ROI.size());
 
         auto ears = ROI[j];
         auto imageName = imageNames[j];
@@ -32,8 +31,7 @@ void alignImages(vector<vector<Mat>> &processedROI,
                  vector<vector<vector<Point2d>>> landmarks,
                  vector<string> imageNames) {
     for (int i = 0; i < processedROI.size(); i++) {
-        float progress = (float)i / (float)(processedROI.size() - 1);
-        printProgress(progress);
+        printProgress(i, processedROI.size());
 
         auto images = processedROI[i];
         auto imageName = imageNames[i];
@@ -46,7 +44,6 @@ void alignImages(vector<vector<Mat>> &processedROI,
             alignImage(image, ldmk, imageName, id);
         }
     }
-    cout << endl << flush;
 }
 
 void alignImage(Mat &image, vector<Point2d> landmarks, String imageName,

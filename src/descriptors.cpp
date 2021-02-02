@@ -45,11 +45,10 @@ void _detectLandmarks(Mat img, vector<Point2d> &ldmk) {
 }
 
 void detectLandmark(vector<vector<Mat>> processedROI,
-                       vector<vector<vector<Point2d>>> &landmarks,
-                       vector<string> imageNames) {
+                    vector<vector<vector<Point2d>>> &landmarks,
+                    vector<string> imageNames) {
     for (int i = 0; i < processedROI.size(); i++) {
-        float progress = (float)i / (float)(processedROI.size() - 1);
-        printProgress(progress);
+        printProgress(i, processedROI.size());
 
         auto images = processedROI[i];
         auto imageName = imageNames[i];
@@ -68,5 +67,58 @@ void detectLandmark(vector<vector<Mat>> processedROI,
             writeToFile(imageName, LANDMARK_PATH, outImg, to_string(i));
         }
         landmarks.push_back(ldmks);
+    }
+}
+
+void extractFeatures(vector<vector<Mat>> images,
+                     vector<vector<Mat>> &descriptors, int edgeThreshold,
+                     InputArray mask) {
+    Ptr<FeatureDetector> detector = ORB::create(500, 1.2f, 8, edgeThreshold);
+
+    for (int i = 0; i < images.size(); i++) {
+        printProgress(i, images.size());
+        auto image = images[i];
+        vector<Mat> imageDescriptors;
+
+        for (auto roi : image) {
+            vector<KeyPoint> keypoints;
+            Mat roiDescriptors;
+
+            detector->detectAndCompute(roi, mask, keypoints, roiDescriptors);
+            imageDescriptors.push_back(roiDescriptors);
+        }
+        descriptors.push_back(imageDescriptors);
+    }
+}
+
+float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
+                        int normType, float ratio, bool crossCheck) {
+    vector<vector<DMatch>> matches;
+    Ptr<DescriptorMatcher> matcher = BFMatcher::create(normType, crossCheck);
+    matcher->knnMatch(queryDescriptors, objectDescriptors, matches, 2);
+
+    vector<DMatch> goodMatches;
+    for (auto match : matches) {
+        if (match[0].distance < ratio * match[1].distance) {
+            goodMatches.push_back(match[0]);
+        }
+    }
+    return (float)goodMatches.size() / (float)matches.size();
+}
+
+void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
+                     String queryName, vector<string> imageNames,
+                     bool filterByPrefix) {
+    cout << "\nSimilarities with " << queryName << endl;
+    for (int i = 0; i < imageDescriptors.size(); i++) {
+        auto image = imageDescriptors[i];
+        auto imageName = imageNames[i];
+        for (auto objectDescriptor : image) {
+            float score = computeSimilarity(queryDescriptor, objectDescriptor);
+            string queryPrefix = queryName.substr(0, 3);
+            if (!filterByPrefix || startsWith(imageName, queryPrefix)) {
+                printf("%.5f - %s\n", score, imageName.c_str());
+            }
+        }
     }
 }

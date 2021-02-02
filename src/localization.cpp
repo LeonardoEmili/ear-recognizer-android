@@ -28,8 +28,7 @@ void detectROI(char *datasetPath, vector<string> imageNames,
 
     for (int i = 0; i < imageNames.size(); i++) {
         String imageName = imageNames[i];
-        float progress = (float)i / (float)(imageNames.size() - 1);
-        printProgress(progress);
+        printProgress(i, imageNames.size());
 
         ostringstream imgPath;
         imgPath << datasetPath << imageName;
@@ -82,7 +81,7 @@ void detectROI(char *datasetPath, vector<string> imageNames,
         ROI.push_back({});
     }
 
-    cout << "\nDetection rate " << (float)detectedNo / (float)visitedNo << endl << endl << flush;
+    cout << "Detection rate " << (float)detectedNo / (float)visitedNo << endl << flush;
     return;
 }
 

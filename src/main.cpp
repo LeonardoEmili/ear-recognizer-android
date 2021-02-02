@@ -1,3 +1,5 @@
+#include <opencv2/features2d.hpp>
+
 #include "descriptors.hpp"
 #include "localization.hpp"
 #include "utility.hpp"
@@ -20,16 +22,24 @@ int f(int argc, char **argv) {
     cout << "Detecting Regions of Interest (ROI) ...\n" << flush;
     detectROI(datasetPath, imageNames, grayImages, ROI, false);
 
-    cout << "Normalizing input images (cropping and resizing) ...\n" << flush;
+    cout << "\nNormalizing input images (cropping and resizing) ...\n" << flush;
     vector<vector<Mat>> processedROI;
     cropAndResize(ROI, processedROI, imageNames, grayImages);
 
-    cout << "\n\nApplying landmark detection ...\n" << flush;
+    cout << "\nApplying landmark detection ...\n" << flush;
     vector<vector<vector<Point2d>>> landmarks;
     detectLandmark(processedROI, landmarks, imageNames);
 
-    cout << "\n\nAuto-aligning images ...\n" << flush;
+    cout << "\nAuto-aligning images ...\n" << flush;
     alignImages(processedROI, landmarks, imageNames);
+
+    cout << "\nExtracting image descriptors ...\n" << flush;
+    vector<vector<Mat>> descriptors;
+    extractFeatures(processedROI, descriptors);
+
+    int queryIdx = 0;
+    logSimilarities(descriptors[queryIdx][0], descriptors, imageNames[queryIdx],
+                    imageNames, true);
 
     return 0;
 }

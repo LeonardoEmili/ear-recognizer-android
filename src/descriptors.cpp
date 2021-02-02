@@ -109,16 +109,24 @@ float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
 void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
                      String queryName, vector<string> imageNames,
                      bool filterByPrefix) {
-    cout << "\nSimilarities with " << queryName << endl;
+    cout << "\nSimilarities with " << queryName << endl << endl;
+    float bestScore = 0;
+    int bestCandidate = 0;
     for (int i = 0; i < imageDescriptors.size(); i++) {
         auto image = imageDescriptors[i];
         auto imageName = imageNames[i];
         for (auto objectDescriptor : image) {
             float score = computeSimilarity(queryDescriptor, objectDescriptor);
+            if (score > bestScore && score < 1) {
+                bestScore = score;
+                bestCandidate = i;
+            }
             string queryPrefix = queryName.substr(0, 3);
             if (!filterByPrefix || startsWith(imageName, queryPrefix)) {
-                printf("%.5f - %s\n", score, imageName.c_str());
+                printf("%.6f - %s\n", score, imageName.c_str());
             }
         }
     }
+    printf("\nBest candidate: %s with %.6f\n",
+           imageNames[bestCandidate].c_str(), bestScore);
 }

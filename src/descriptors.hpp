@@ -36,4 +36,4 @@ void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
                      bool filterByPrefix = false);
 
 void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
-                        int k = 1);
+                        int k = 3);

@@ -106,7 +106,7 @@ void alignImage(Mat &image, double paddingPercentage, vector<Point2d> landmarks,
     // Zooming using padding
     Mat croppedEar(rotated);
     Rect cropped;
-    int allowanceFactor = 2;
+    double allowanceFactor = 1.2;
     int padding = paddingPercentage * rotated.cols / allowanceFactor;
     cropped.x = padding;
     cropped.y = padding;

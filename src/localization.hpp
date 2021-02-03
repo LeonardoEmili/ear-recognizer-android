@@ -1,3 +1,5 @@
+#pragma once
+
 #include "normalization.hpp"
 
 using namespace samples;

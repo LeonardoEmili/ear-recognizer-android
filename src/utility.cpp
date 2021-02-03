@@ -104,6 +104,22 @@ void displayImage(Mat image, String imageName) {
 
 bool startsWith(String s, String prefix) { return s.rfind(prefix, 0) == 0; }
 
+vector<size_t> argSort(const vector<float> &v, bool ascending) {
+    // initialize original index locations
+    vector<size_t> idx(v.size());
+    iota(idx.begin(), idx.end(), 0);
+
+    if (ascending) {
+        stable_sort(idx.begin(), idx.end(),
+                    [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
+    } else {
+        stable_sort(idx.begin(), idx.end(),
+                    [&v](size_t i1, size_t i2) { return v[i1] > v[i2]; });
+    }
+
+    return idx;
+}
+
 /*
 int detectImageAndDrawLine(Mat frame, CascadeClassifier &cascade, bool
 rightClassifier, bool display, String imageName)

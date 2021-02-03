@@ -1,3 +1,4 @@
+#pragma once
 
 #include <opencv2/dnn.hpp>
 #include <opencv2/features2d.hpp>

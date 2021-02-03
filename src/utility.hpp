@@ -1,3 +1,8 @@
+#pragma once
+
+#include <numeric>      // std::iota
+#include <algorithm>    // std::sort, std::stable_sort
+
 #include <dirent.h>
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
@@ -26,3 +31,5 @@ chrono::steady_clock::time_point getCurrentTime();
 
 float getElapsedSeconds(chrono::steady_clock::time_point start,
                         chrono::steady_clock::time_point end);
+
+vector<size_t> argSort(const vector<float> &v, bool ascending = true);

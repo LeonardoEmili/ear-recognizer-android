@@ -1,13 +1,14 @@
 #pragma once
 
-#include <numeric>      // std::iota
-#include <algorithm>    // std::sort, std::stable_sort
+#include <numeric>
+#include <algorithm>
 
 #include <dirent.h>
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/core/utils/filesystem.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <chrono>
 
 using namespace cv;
@@ -33,3 +34,6 @@ float getElapsedSeconds(chrono::steady_clock::time_point start,
                         chrono::steady_clock::time_point end);
 
 vector<size_t> argSort(const vector<float> &v, bool ascending = true);
+
+void drawLandmarks(Mat image, const vector<Point2d> landmarks, Mat &outImage,
+                   const Scalar color = Scalar(0, 0, 255), int radius = 3);

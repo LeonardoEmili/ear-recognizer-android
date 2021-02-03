@@ -54,23 +54,57 @@ void detectLandmark(vector<vector<Mat>> processedROI,
         auto imageName = imageNames[i];
 
         vector<vector<Point2d>> ldmks;
-        for (auto imageROI : images) {
+        for (int j = 0; j < images.size(); j++) {
+            auto imageROI = images[j];
             vector<Point2d> ldmk;
             _detectLandmarks(imageROI, ldmk);
             ldmks.push_back(ldmk);
-            Mat outImg = imageROI.clone();
 
-            for (Point2d l : ldmk) {
-                circle(outImg, l, 5, Scalar(0, 0, 255), FILLED);
-            }
+            Mat outImage;
+            drawLandmarks(imageROI, ldmk, outImage);
             // Exporting landmark image
-            writeToFile(imageName, LANDMARK_PATH, outImg, to_string(i));
+            String id = to_string(i) + "_" + to_string(j);
+            writeToFile(imageName, LANDMARK_PATH, outImage, id);
         }
         landmarks.push_back(ldmks);
     }
 }
 
 void extractFeatures(vector<vector<Mat>> images,
+                     vector<vector<vector<Point2d>>> &landmarks,
+                     vector<string> imageNames) {
+    vector<vector<vector<KeyPoint>>> keypoints;
+    vector<vector<Mat>> _;
+    extractFeatures(images, keypoints, _);
+
+    // Translate KeyPoint -> Point2d
+    for (auto image : keypoints) {
+        vector<vector<Point2d>> imgLdmks;
+        for (auto kpts : image) {
+            vector<Point2d> ldmks;
+            for (auto k : kpts) {
+                ldmks.push_back(Point2d((double)k.pt.x, (double)k.pt.y));
+            }
+            imgLdmks.push_back(ldmks);
+        }
+        landmarks.push_back(imgLdmks);
+    }
+
+    for (int i = 0; i < images.size(); i++) {
+        auto image = images[i];
+        auto imageName = imageNames[i];
+        for (int j = 0; j < image.size(); j++) {
+            Mat outImage;
+            drawLandmarks(image[j], landmarks[i][j], outImage);
+            // Exporting landmark image
+            String id = to_string(i) + "_" + to_string(j);
+            writeToFile(imageName, LANDMARK_PATH, outImage, id);
+        }
+    }
+}
+
+void extractFeatures(vector<vector<Mat>> images,
+                     vector<vector<vector<KeyPoint>>> &keypoints,
                      vector<vector<Mat>> &descriptors, int edgeThreshold,
                      InputArray mask) {
     Ptr<FeatureDetector> detector = ORB::create(500, 1.2f, 8, edgeThreshold);
@@ -79,15 +113,18 @@ void extractFeatures(vector<vector<Mat>> images,
         printProgress(i, images.size());
         auto image = images[i];
         vector<Mat> imageDescriptors;
+        vector<vector<KeyPoint>> imageKeypoints;
 
         for (auto roi : image) {
-            vector<KeyPoint> keypoints;
+            vector<KeyPoint> ROIkeypoints;
             Mat roiDescriptors;
 
-            detector->detectAndCompute(roi, mask, keypoints, roiDescriptors);
+            detector->detectAndCompute(roi, mask, ROIkeypoints, roiDescriptors);
             imageDescriptors.push_back(roiDescriptors);
+            imageKeypoints.push_back(ROIkeypoints);
         }
         descriptors.push_back(imageDescriptors);
+        keypoints.push_back(imageKeypoints);
     }
 }
 
@@ -131,7 +168,7 @@ void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
             }
         }
     }
-    for (auto i: argSort(outScores, false)) {
+    for (auto i : argSort(outScores, false)) {
         printf("%.6f - %s\n", outScores[i], outNames[i].c_str());
     }
 }

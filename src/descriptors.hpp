@@ -19,8 +19,13 @@ void detectLandmark(vector<vector<Mat>> processedROI,
                     vector<string> imageNames);
 
 void extractFeatures(vector<vector<Mat>> images,
+                     vector<vector<vector<KeyPoint>>> &keypoints,
                      vector<vector<Mat>> &descriptors, int edgeThreshold = 10,
                      InputArray mask = noArray());
+
+void extractFeatures(vector<vector<Mat>> images,
+                     vector<vector<vector<Point2d>>> &landmarks,
+                     vector<string> imageNames);
 
 float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
                         int normType = NORM_HAMMING, float ratio = 0.75,

@@ -120,6 +120,14 @@ vector<size_t> argSort(const vector<float> &v, bool ascending) {
     return idx;
 }
 
+void drawLandmarks(Mat image, const vector<Point2d> landmarks, Mat &outImage,
+                   const Scalar color, int radius) {
+    cvtColor(image, outImage, COLOR_GRAY2RGB);
+    for (Point2d landmark : landmarks) {
+        circle(outImage, landmark, radius, color, FILLED);
+    }
+}
+
 /*
 int detectImageAndDrawLine(Mat frame, CascadeClassifier &cascade, bool
 rightClassifier, bool display, String imageName)

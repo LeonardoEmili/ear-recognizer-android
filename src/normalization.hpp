@@ -12,13 +12,13 @@
 using namespace cv;
 using namespace std;
 
-void cropAndResize(vector<vector<Rect>> &ROI, vector<vector<Mat>> &outputImages,
+void cropAndResize(vector<vector<Rect>> &ROI, vector<vector<Mat>> &outputImages, vector<vector<double>> &paddingPercentages,
                    vector<string> imageNames, vector<Mat> grayImages,
                    int outputSize = NORMALIZATION_SIZE);
 
-void alignImages(vector<vector<Mat>> &processedROI,
+void alignImages(vector<vector<Mat>> &processedROI, vector<vector<double>> &paddingPercentages,
                  vector<vector<vector<Point2d>>> landmarks,
                  vector<string> imageNames);
 
-void alignImage(Mat &image, vector<Point2d> landmarks, String imageName,
+void alignImage(Mat &image, double paddingPercentage, vector<Point2d> landmarks, String imageName,
                 String id, int outputSize = NORMALIZATION_SIZE);

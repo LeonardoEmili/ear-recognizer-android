@@ -1,18 +1,38 @@
 #include "normalization.hpp"
 
 void cropAndResize(vector<vector<Rect>> &ROI, vector<vector<Mat>> &outputImages,
+                   vector<vector<double>> &paddingPercentages,
                    vector<string> imageNames, vector<Mat> grayImages,
-                   int outputSize) {
-    for (int j = 0; j < ROI.size(); ++j) {
+                   int outputSize)
+{
+    for (int j = 0; j < ROI.size(); ++j)
+    {
         printProgress(j, ROI.size());
 
         auto ears = ROI[j];
         auto imageName = imageNames[j];
         Mat croppedEar(grayImages[j]), resized;
         vector<Mat> resizedImages;
+        vector<double> paddingPercs;
 
-        for (int i = 0; i < ears.size(); ++i) {
+        for (int i = 0; i < ears.size(); ++i)
+        {
             Rect ear = ears[i];
+
+            // Setting padding around the ROI to perform a smoother rotation (it will be later removed by zooming)
+            double padding = 80.0;
+            // Checking that the padding does not get out of the image
+            if (!(ear.x - padding >= 0 && ear.y - padding >= 0 && ear.x + ear.width + padding < croppedEar.cols && ear.y + ear.height + padding < croppedEar.rows))
+            {
+                padding = min(min(ear.x - 1, ear.y - 1), min(croppedEar.cols - (ear.x + ear.width) - 1, croppedEar.rows - (ear.y + ear.height) - 1));
+            }
+            ear.x -= padding;
+            ear.y -= padding;
+            ear.height += 2 * padding;
+            ear.width += 2 * padding;
+
+            double paddingPercentage = padding / croppedEar.cols;
+            paddingPercs.push_back(paddingPercentage);
 
             croppedEar = croppedEar(ear);
             Mat outputImg = croppedEar;
@@ -24,30 +44,37 @@ void cropAndResize(vector<vector<Rect>> &ROI, vector<vector<Mat>> &outputImages,
             writeToFile(imageName, CROPPED_PATH, resized, id);
         }
         outputImages.push_back(resizedImages);
+        paddingPercentages.push_back(paddingPercs);
     }
 }
 
-void alignImages(vector<vector<Mat>> &processedROI,
+void alignImages(vector<vector<Mat>> &processedROI, vector<vector<double>> &paddingPercentages,
                  vector<vector<vector<Point2d>>> landmarks,
-                 vector<string> imageNames) {
-    for (int i = 0; i < processedROI.size(); i++) {
+                 vector<string> imageNames)
+{
+    for (int i = 0; i < processedROI.size(); i++)
+    {
         printProgress(i, processedROI.size());
 
         auto images = processedROI[i];
         auto imageName = imageNames[i];
         auto ldmks = landmarks[i];
-        for (int j = 0; j < images.size(); j++) {
+        auto paddingPercs = paddingPercentages[i];
+        for (int j = 0; j < images.size(); j++)
+        {
             auto image = images[j];
             auto ldmk = ldmks[j];
+            auto paddingPercentage = paddingPercs[j];
             String id = to_string(i) + "_" + to_string(j);
 
-            alignImage(image, ldmk, imageName, id);
+            alignImage(image, paddingPercentage, ldmk, imageName, id);
         }
     }
 }
 
-void alignImage(Mat &image, vector<Point2d> landmarks, String imageName,
-                String id, int outputSize) {
+void alignImage(Mat &image, double paddingPercentage, vector<Point2d> landmarks, String imageName,
+                String id, int outputSize)
+{
     // Fitting line among landmark points
     Vec4f line;
     fitLine(landmarks, line, DIST_L2, 0, 0.01, 0.01);
@@ -76,8 +103,19 @@ void alignImage(Mat &image, vector<Point2d> landmarks, String imageName,
     warpAffine(image, rotated, rot, bbox.size(), INTER_LANCZOS4,
                BORDER_REPLICATE);
 
+    // Zooming using padding
+    Mat croppedEar(rotated);
+    Rect cropped;
+    int allowanceFactor = 2;
+    int padding = paddingPercentage * rotated.cols / allowanceFactor;
+    cropped.x = padding;
+    cropped.y = padding;
+    cropped.width = rotated.cols - 2 * padding;
+    cropped.height = rotated.rows - 2 * padding;
+    croppedEar = croppedEar(cropped);
+
     // Resizing rotated image
-    resize(rotated, image, Size(outputSize, outputSize));
+    resize(croppedEar, image, Size(outputSize, outputSize));
 
     // Exporting rotated image
     writeToFile(imageName, ROTATED_PATH, image, id);

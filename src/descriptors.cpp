@@ -70,6 +70,24 @@ void detectLandmark(vector<vector<Mat>> processedROI,
     }
 }
 
+void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
+                        int k) {
+    Point2d centroid(computeCentroid(points));
+    // vector<Point2d> _points(points);
+    // points.clear();
+    outPoints.clear();
+
+    vector<double> distances;
+    double mean, std;
+    for (auto p : points) distances.push_back(norm(p - centroid));
+    computeMeanAndStd(distances, mean, std);
+
+    for (int i = 0; i < points.size(); i++) {
+        if (distances[i] < k * std) outPoints.push_back(points[i]);
+    }
+    if (outPoints.size() < 2) outPoints = points;
+}
+
 void extractFeatures(vector<vector<Mat>> images,
                      vector<vector<vector<Point2d>>> &landmarks,
                      vector<string> imageNames) {
@@ -90,12 +108,26 @@ void extractFeatures(vector<vector<Mat>> images,
         landmarks.push_back(imgLdmks);
     }
 
+    vector<vector<vector<Point2d>>> outLandmarks;
+    for (auto image : landmarks) {
+        vector<vector<Point2d>> outLdmks;
+        for (auto ldmk : image) {
+            vector<Point2d> outLdmk;
+            reduceDataSparsity(ldmk, outLdmk);
+            outLdmks.push_back(outLdmk);
+        }
+        outLandmarks.push_back(outLdmks);
+    }
+
     for (int i = 0; i < images.size(); i++) {
         auto image = images[i];
         auto imageName = imageNames[i];
         for (int j = 0; j < image.size(); j++) {
             Mat outImage;
             drawLandmarks(image[j], landmarks[i][j], outImage);
+            drawLandmarks(outImage, outLandmarks[i][j], outImage,
+                          Scalar(0, 255, 0), 5);
+            landmarks[i][j] = outLandmarks[i][j];
             // Exporting landmark image
             String id = to_string(i) + "_" + to_string(j);
             writeToFile(imageName, LANDMARK_PATH, outImage, id);

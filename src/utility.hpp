@@ -37,3 +37,7 @@ vector<size_t> argSort(const vector<float> &v, bool ascending = true);
 
 void drawLandmarks(Mat image, const vector<Point2d> landmarks, Mat &outImage,
                    const Scalar color = Scalar(0, 0, 255), int radius = 3);
+
+Point2d computeCentroid(vector<Point2d> points);
+
+void computeMeanAndStd(vector<double> values, double &mean, double &std);

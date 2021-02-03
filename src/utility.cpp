@@ -122,10 +122,23 @@ vector<size_t> argSort(const vector<float> &v, bool ascending) {
 
 void drawLandmarks(Mat image, const vector<Point2d> landmarks, Mat &outImage,
                    const Scalar color, int radius) {
-    cvtColor(image, outImage, COLOR_GRAY2RGB);
+    if (image.channels() != 3) cvtColor(image, outImage, COLOR_GRAY2RGB);
     for (Point2d landmark : landmarks) {
-        circle(outImage, landmark, radius, color, FILLED);
+        circle(outImage, landmark, radius, color);
     }
+}
+
+Point2d computeCentroid(vector<Point2d> points) {
+    return accumulate(points.begin(), points.end(), Point2d(0, 0)) *
+           (1.0f / points.size());
+}
+
+void computeMeanAndStd(vector<double> values, double &mean, double &std) {
+    mean = 0.0f, std = 0.0f;
+    for (double v : values) mean += v;
+    mean = mean * (1.0f / values.size());
+    for (double v : values) std += (v - mean) * (v - mean);
+    std = sqrt(std * (1.0f / values.size()));
 }
 
 /*

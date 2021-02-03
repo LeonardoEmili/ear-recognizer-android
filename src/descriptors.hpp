@@ -34,3 +34,6 @@ float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
 void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
                      String queryName, vector<string> imageNames,
                      bool filterByPrefix = false);
+
+void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
+                        int k = 1);

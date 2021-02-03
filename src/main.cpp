@@ -38,9 +38,9 @@ int f(int argc, char **argv) {
     vector<vector<Mat>> descriptors;
     extractFeatures(processedROI, keypoints, descriptors);
 
-    int queryIdx = 0;
+    int queryIdx = 1;
     logSimilarities(descriptors[queryIdx][0], descriptors, imageNames[queryIdx],
-                    imageNames, true);
+                    imageNames, false);
 
     return 0;
 }

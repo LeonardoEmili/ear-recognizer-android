@@ -1,4 +1,4 @@
-# Ear-Recognition-Android
+# Ear-Recognizer-Android
 Ear recognition system leveraging Android camera for online identification of enrolled subjects.
 
 ## Datasets

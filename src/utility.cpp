@@ -141,6 +141,10 @@ void computeMeanAndStd(vector<double> values, double &mean, double &std) {
     std = sqrt(std * (1.0f / values.size()));
 }
 
+bool equalMats(Mat a, Mat b) {
+    return countNonZero((a != b)) == 0;
+}
+
 /*
 int detectImageAndDrawLine(Mat frame, CascadeClassifier &cascade, bool
 rightClassifier, bool display, String imageName)

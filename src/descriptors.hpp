@@ -7,6 +7,11 @@
 #include "utility.hpp"
 
 #define LANDMARK_PATH "generated/landmark/"
+#define FEATURES_PATH "generated/descriptors.xml"
+#define FEATURES_KEY "features"
+#define NAMES_KEY "names"
+
+#define STD_DEFAULT 3
 
 using namespace cv;
 using namespace cv::dnn;
@@ -23,6 +28,10 @@ void extractFeatures(vector<vector<Mat>> images,
                      vector<vector<Mat>> &descriptors, int edgeThreshold = 10,
                      InputArray mask = noArray());
 
+void extractFeatures(vector<vector<Mat>> images, vector<Mat> &descriptors,
+                     vector<string> &imageNames, int edgeThreshold = 10,
+                     InputArray mask = noArray());
+
 void extractFeatures(vector<vector<Mat>> images,
                      vector<vector<vector<Point2d>>> &landmarks,
                      vector<string> imageNames);
@@ -31,9 +40,15 @@ float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
                         int normType = NORM_HAMMING, float ratio = 0.75,
                         bool crossCheck = false);
 
-void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
+void logSimilarities(Mat queryDescriptor, vector<Mat> imageDescriptors,
                      String queryName, vector<string> imageNames,
                      bool filterByPrefix = false);
 
 void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
-                        int k = 3);
+                        int k = STD_DEFAULT);
+
+void exportFeatures(vector<Mat> descriptors, vector<string> imageNames,
+                    const string path = FEATURES_PATH);
+
+void importFeatures(vector<Mat> &descriptors, vector<string> &imageNames,
+                    const string path = FEATURES_PATH);

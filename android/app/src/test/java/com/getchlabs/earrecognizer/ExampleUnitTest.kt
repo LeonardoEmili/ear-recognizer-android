@@ -1,4 +1,4 @@
-package project.bs.earrecognition
+package com.getchlabs.earrecognizer
 
 import org.junit.Test
 

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Ear_Recognition.iml" filepath="$PROJECT_DIR$/.idea/modules/Ear_Recognition.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Ear_Recognition.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Ear_Recognition.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Ear_Recognizer.iml" filepath="$PROJECT_DIR$/.idea/modules/Ear_Recognizer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Ear_Recognizer.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Ear_Recognizer.app.iml" />
     </modules>
   </component>
 </project>

@@ -34,12 +34,13 @@ int f(int argc, char **argv) {
     alignImages(processedROI, paddingPercentages, landmarks, imageNames);
 
     cout << "\nExtracting image descriptors ...\n" << flush;
-    vector<vector<vector<KeyPoint>>> keypoints;
-    vector<vector<Mat>> descriptors;
-    extractFeatures(processedROI, keypoints, descriptors);
+    vector<Mat> descriptors;
+    extractFeatures(processedROI, descriptors, imageNames);
+
+    exportFeatures(descriptors, imageNames);
 
     int queryIdx = 1;
-    logSimilarities(descriptors[queryIdx][0], descriptors, imageNames[queryIdx],
+    logSimilarities(descriptors[queryIdx], descriptors, imageNames[queryIdx],
                     imageNames, false);
 
     return 0;

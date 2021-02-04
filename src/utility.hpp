@@ -41,3 +41,5 @@ void drawLandmarks(Mat image, const vector<Point2d> landmarks, Mat &outImage,
 Point2d computeCentroid(vector<Point2d> points);
 
 void computeMeanAndStd(vector<double> values, double &mean, double &std);
+
+bool equalMats(Mat a, Mat b);

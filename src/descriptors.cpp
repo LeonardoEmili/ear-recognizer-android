@@ -113,7 +113,7 @@ void extractFeatures(vector<vector<Mat>> images,
         vector<vector<Point2d>> outLdmks;
         for (auto ldmk : image) {
             vector<Point2d> outLdmk;
-            reduceDataSparsity(ldmk, outLdmk);
+            reduceDataSparsity(ldmk, outLdmk, 3);
             outLdmks.push_back(outLdmk);
         }
         outLandmarks.push_back(outLdmks);
@@ -131,6 +131,43 @@ void extractFeatures(vector<vector<Mat>> images,
             // Exporting landmark image
             String id = to_string(i) + "_" + to_string(j);
             writeToFile(imageName, LANDMARK_PATH, outImage, id);
+        }
+    }
+}
+
+void exportFeatures(vector<Mat> descriptors, vector<string> imageNames,
+                    const string path) {
+    FileStorage fs(path, FileStorage::WRITE);
+    fs << FEATURES_KEY << descriptors << NAMES_KEY << imageNames;
+    fs.release();
+}
+
+void importFeatures(vector<Mat> &descriptors, vector<string> &imageNames,
+                    const string path) {
+    FileStorage fs(path, FileStorage::READ);
+    fs[FEATURES_KEY] >> descriptors;
+    fs[NAMES_KEY] >> imageNames;
+    fs.release();
+}
+
+void extractFeatures(vector<vector<Mat>> images, vector<Mat> &descriptors,
+                     vector<string> &imageNames, int edgeThreshold,
+                     InputArray mask) {
+    vector<vector<vector<KeyPoint>>> keypoints;
+    vector<vector<Mat>> tmpDescriptors;
+    extractFeatures(images, keypoints, tmpDescriptors);
+
+    vector<string> outNames(imageNames);
+    imageNames.clear();
+    descriptors.clear();
+
+    // Flatten the descriptor matrix to a 1D vector, where each
+    // element corresponds 1:1 to an element of vector imageNames
+    for (int i = 0; i < tmpDescriptors.size(); i++) {
+        int idx = outNames[i].rfind(".");
+        for (auto descriptor : tmpDescriptors[i]) {
+            descriptors.push_back(descriptor);
+            imageNames.push_back(outNames[i].substr(0, idx));
         }
     }
 }
@@ -175,29 +212,21 @@ float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
     return (float)goodMatches.size() / (float)matches.size();
 }
 
-void logSimilarities(Mat queryDescriptor, vector<vector<Mat>> imageDescriptors,
+void logSimilarities(Mat queryDescriptor, vector<Mat> imageDescriptors,
                      String queryName, vector<string> imageNames,
                      bool filterByPrefix) {
     cout << "\nSimilarities with " << queryName << endl;
-    float bestScore = 0;
-    int bestCandidate = 0;
-
     vector<string> outNames;
     vector<float> outScores;
     for (int i = 0; i < imageDescriptors.size(); i++) {
-        auto image = imageDescriptors[i];
+        auto objectDescriptor = imageDescriptors[i];
         auto imageName = imageNames[i];
-        for (auto objectDescriptor : image) {
-            float score = computeSimilarity(queryDescriptor, objectDescriptor);
-            if (score > bestScore && score < 1) {
-                bestScore = score;
-                bestCandidate = i;
-            }
-            string queryPrefix = queryName.substr(0, 3);
-            if (!filterByPrefix || startsWith(imageName, queryPrefix)) {
-                outScores.push_back(score);
-                outNames.push_back(imageName);
-            }
+        float score = computeSimilarity(queryDescriptor, objectDescriptor);
+
+        string queryPrefix = queryName.substr(0, 3);
+        if (!filterByPrefix || startsWith(imageName, queryPrefix)) {
+            outScores.push_back(score);
+            outNames.push_back(imageName);
         }
     }
     for (auto i : argSort(outScores, false)) {

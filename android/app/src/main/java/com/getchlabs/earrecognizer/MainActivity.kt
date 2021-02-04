@@ -1,11 +1,17 @@
 package com.getchlabs.earrecognizer
 
+import android.R.attr
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import org.opencv.android.OpenCVLoader
+import java.io.BufferedInputStream
+import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -13,13 +19,17 @@ class MainActivity : AppCompatActivity() {
     val PICK_IMAGE = 1
 
     private lateinit var btnPickImage: Button
+    private lateinit var imgEar: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Toast.makeText(this, OpenCVLoader.initDebug().toString(), Toast.LENGTH_LONG).show();
+
         btnPickImage = findViewById(R.id.btn_pick_image)
         btnPickImage.setOnClickListener { pickImage() }
+        imgEar = findViewById(R.id.img_ear)
     }
 
     fun pickImage() {
@@ -39,7 +49,14 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE) {
             //TODO: action
-            Toast.makeText(this, "HEllooo", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
+            val inputStream: InputStream? = getContentResolver().openInputStream(data?.data!!)
+            val bufferedInputStream =  BufferedInputStream(inputStream);
+            val bmp = BitmapFactory.decodeStream(bufferedInputStream);
+
+
+            imgEar.setImageBitmap(bmp)
+
         }
     }
 }

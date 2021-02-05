@@ -52,3 +52,9 @@ void exportFeatures(vector<Mat> descriptors, vector<string> imageNames,
 
 void importFeatures(vector<Mat> &descriptors, vector<string> &imageNames,
                     const string path = FEATURES_PATH);
+
+double calculateVerificationGAR(vector<Mat> imageDescriptors, vector<string> imageNames,
+                                double threshold);
+
+double calculateVerificationFAR(vector<Mat> imageDescriptors, vector<string> imageNames,
+                                double threshold);

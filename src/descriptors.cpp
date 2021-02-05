@@ -17,14 +17,17 @@
 /* Return: none */
 /* ---------------------------------------------------------------------------------------
  */
-void _detectLandmarks(Mat img, vector<Point2d> &ldmk) {
+void _detectLandmarks(Mat img, vector<Point2d> &ldmk)
+{
     static bool first = true;
     static Net net;
 
-    if (first) {
+    if (first)
+    {
         first = false;
         net = readNetFromTensorflow("model-stage1.pb");
-        if (net.empty()) {
+        if (net.empty())
+        {
             cerr << "ERROR: Could not load the CNNs for landmark detection"
                  << endl
                  << flush;
@@ -46,15 +49,18 @@ void _detectLandmarks(Mat img, vector<Point2d> &ldmk) {
 
 void detectLandmark(vector<vector<Mat>> processedROI,
                     vector<vector<vector<Point2d>>> &landmarks,
-                    vector<string> imageNames) {
-    for (int i = 0; i < processedROI.size(); i++) {
+                    vector<string> imageNames)
+{
+    for (int i = 0; i < processedROI.size(); i++)
+    {
         printProgress(i, processedROI.size());
 
         auto images = processedROI[i];
         auto imageName = imageNames[i];
 
         vector<vector<Point2d>> ldmks;
-        for (int j = 0; j < images.size(); j++) {
+        for (int j = 0; j < images.size(); j++)
+        {
             auto imageROI = images[j];
             vector<Point2d> ldmk;
             _detectLandmarks(imageROI, ldmk);
@@ -71,7 +77,8 @@ void detectLandmark(vector<vector<Mat>> processedROI,
 }
 
 void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
-                        int k) {
+                        int k)
+{
     Point2d centroid(computeCentroid(points));
     // vector<Point2d> _points(points);
     // points.clear();
@@ -79,28 +86,36 @@ void reduceDataSparsity(vector<Point2d> points, vector<Point2d> &outPoints,
 
     vector<double> distances;
     double mean, std;
-    for (auto p : points) distances.push_back(norm(p - centroid));
+    for (auto p : points)
+        distances.push_back(norm(p - centroid));
     computeMeanAndStd(distances, mean, std);
 
-    for (int i = 0; i < points.size(); i++) {
-        if (distances[i] < k * std) outPoints.push_back(points[i]);
+    for (int i = 0; i < points.size(); i++)
+    {
+        if (distances[i] < k * std)
+            outPoints.push_back(points[i]);
     }
-    if (outPoints.size() < 2) outPoints = points;
+    if (outPoints.size() < 2)
+        outPoints = points;
 }
 
 void extractFeatures(vector<vector<Mat>> images,
                      vector<vector<vector<Point2d>>> &landmarks,
-                     vector<string> imageNames) {
+                     vector<string> imageNames)
+{
     vector<vector<vector<KeyPoint>>> keypoints;
     vector<vector<Mat>> _;
     extractFeatures(images, keypoints, _);
 
     // Translate KeyPoint -> Point2d
-    for (auto image : keypoints) {
+    for (auto image : keypoints)
+    {
         vector<vector<Point2d>> imgLdmks;
-        for (auto kpts : image) {
+        for (auto kpts : image)
+        {
             vector<Point2d> ldmks;
-            for (auto k : kpts) {
+            for (auto k : kpts)
+            {
                 ldmks.push_back(Point2d((double)k.pt.x, (double)k.pt.y));
             }
             imgLdmks.push_back(ldmks);
@@ -109,9 +124,11 @@ void extractFeatures(vector<vector<Mat>> images,
     }
 
     vector<vector<vector<Point2d>>> outLandmarks;
-    for (auto image : landmarks) {
+    for (auto image : landmarks)
+    {
         vector<vector<Point2d>> outLdmks;
-        for (auto ldmk : image) {
+        for (auto ldmk : image)
+        {
             vector<Point2d> outLdmk;
             reduceDataSparsity(ldmk, outLdmk, 3);
             outLdmks.push_back(outLdmk);
@@ -119,10 +136,12 @@ void extractFeatures(vector<vector<Mat>> images,
         outLandmarks.push_back(outLdmks);
     }
 
-    for (int i = 0; i < images.size(); i++) {
+    for (int i = 0; i < images.size(); i++)
+    {
         auto image = images[i];
         auto imageName = imageNames[i];
-        for (int j = 0; j < image.size(); j++) {
+        for (int j = 0; j < image.size(); j++)
+        {
             Mat outImage;
             drawLandmarks(image[j], landmarks[i][j], outImage);
             drawLandmarks(outImage, outLandmarks[i][j], outImage,
@@ -136,14 +155,16 @@ void extractFeatures(vector<vector<Mat>> images,
 }
 
 void exportFeatures(vector<Mat> descriptors, vector<string> imageNames,
-                    const string path) {
+                    const string path)
+{
     FileStorage fs(path, FileStorage::WRITE);
     fs << FEATURES_KEY << descriptors << NAMES_KEY << imageNames;
     fs.release();
 }
 
 void importFeatures(vector<Mat> &descriptors, vector<string> &imageNames,
-                    const string path) {
+                    const string path)
+{
     FileStorage fs(path, FileStorage::READ);
     fs[FEATURES_KEY] >> descriptors;
     fs[NAMES_KEY] >> imageNames;
@@ -152,7 +173,8 @@ void importFeatures(vector<Mat> &descriptors, vector<string> &imageNames,
 
 void extractFeatures(vector<vector<Mat>> images, vector<Mat> &descriptors,
                      vector<string> &imageNames, int edgeThreshold,
-                     InputArray mask) {
+                     InputArray mask)
+{
     vector<vector<vector<KeyPoint>>> keypoints;
     vector<vector<Mat>> tmpDescriptors;
     extractFeatures(images, keypoints, tmpDescriptors);
@@ -163,9 +185,11 @@ void extractFeatures(vector<vector<Mat>> images, vector<Mat> &descriptors,
 
     // Flatten the descriptor matrix to a 1D vector, where each
     // element corresponds 1:1 to an element of vector imageNames
-    for (int i = 0; i < tmpDescriptors.size(); i++) {
+    for (int i = 0; i < tmpDescriptors.size(); i++)
+    {
         int idx = outNames[i].rfind(".");
-        for (auto descriptor : tmpDescriptors[i]) {
+        for (auto descriptor : tmpDescriptors[i])
+        {
             descriptors.push_back(descriptor);
             imageNames.push_back(outNames[i].substr(0, idx));
         }
@@ -175,16 +199,19 @@ void extractFeatures(vector<vector<Mat>> images, vector<Mat> &descriptors,
 void extractFeatures(vector<vector<Mat>> images,
                      vector<vector<vector<KeyPoint>>> &keypoints,
                      vector<vector<Mat>> &descriptors, int edgeThreshold,
-                     InputArray mask) {
+                     InputArray mask)
+{
     Ptr<FeatureDetector> detector = ORB::create(500, 1.2f, 8, edgeThreshold);
 
-    for (int i = 0; i < images.size(); i++) {
+    for (int i = 0; i < images.size(); i++)
+    {
         printProgress(i, images.size());
         auto image = images[i];
         vector<Mat> imageDescriptors;
         vector<vector<KeyPoint>> imageKeypoints;
 
-        for (auto roi : image) {
+        for (auto roi : image)
+        {
             vector<KeyPoint> ROIkeypoints;
             Mat roiDescriptors;
 
@@ -198,14 +225,17 @@ void extractFeatures(vector<vector<Mat>> images,
 }
 
 float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
-                        int normType, float ratio, bool crossCheck) {
+                        int normType, float ratio, bool crossCheck)
+{
     vector<vector<DMatch>> matches;
     Ptr<DescriptorMatcher> matcher = BFMatcher::create(normType, crossCheck);
     matcher->knnMatch(queryDescriptors, objectDescriptors, matches, 2);
 
     vector<DMatch> goodMatches;
-    for (auto match : matches) {
-        if (match[0].distance < ratio * match[1].distance) {
+    for (auto match : matches)
+    {
+        if (match[0].distance < ratio * match[1].distance)
+        {
             goodMatches.push_back(match[0]);
         }
     }
@@ -214,22 +244,98 @@ float computeSimilarity(Mat queryDescriptors, Mat objectDescriptors,
 
 void logSimilarities(Mat queryDescriptor, vector<Mat> imageDescriptors,
                      String queryName, vector<string> imageNames,
-                     bool filterByPrefix) {
+                     bool filterByPrefix)
+{
     cout << "\nSimilarities with " << queryName << endl;
     vector<string> outNames;
     vector<float> outScores;
-    for (int i = 0; i < imageDescriptors.size(); i++) {
+    for (int i = 0; i < imageDescriptors.size(); i++)
+    {
         auto objectDescriptor = imageDescriptors[i];
         auto imageName = imageNames[i];
         float score = computeSimilarity(queryDescriptor, objectDescriptor);
 
         string queryPrefix = queryName.substr(0, 3);
-        if (!filterByPrefix || startsWith(imageName, queryPrefix)) {
+        if (!filterByPrefix || startsWith(imageName, queryPrefix))
+        {
             outScores.push_back(score);
             outNames.push_back(imageName);
         }
     }
-    for (auto i : argSort(outScores, false)) {
+    for (auto i : argSort(outScores, false))
+    {
         printf("%.6f - %s\n", outScores[i], outNames[i].c_str());
     }
+}
+
+double calculateVerificationGAR(vector<Mat> imageDescriptors, vector<string> imageNames,
+                                double threshold)
+{
+    // Since we only attempt with the given identity templates, this corresponds to the
+    // number of true acceptances and false rejections (so false acceptances and true
+    // rejections are not considered).
+    double attemptsNo = 0.0;
+    double acceptancesNo = 0.0;
+
+    for (int i = 0; i < imageNames.size(); i++)
+    {
+        string identityPrefix = imageNames[i].substr(0, 3);
+        for (int j = 0; j < imageNames.size(); j++)
+        {
+            // Avoiding self comparison
+            if (i == j)
+            {
+                continue;
+            }
+            if (!startsWith(imageNames[j], identityPrefix))
+            {
+                continue;
+            }
+            attemptsNo++;
+            if (computeSimilarity(imageDescriptors[i], imageDescriptors[j]) > threshold)
+            {
+                acceptancesNo++;
+            }
+        }
+    }
+    //cout << acceptancesNo << "\n";
+    //cout << attemptsNo << "\n";
+
+    return acceptancesNo / attemptsNo;
+}
+
+double calculateVerificationFAR(vector<Mat> imageDescriptors, vector<string> imageNames,
+                                double threshold)
+{
+    // Since we only attempt with templates belonging to identities different from
+    //  the given one, this corresponds to the number of false acceptances and true
+    //  rejections (so true acceptances and false rejections are not considered).
+    double attemptsNo = 0.0;
+    double acceptancesNo = 0.0;
+
+    for (int i = 0; i < imageNames.size(); i++)
+    {
+        string identityPrefix = imageNames[i].substr(0, 3);
+        for (int j = 0; j < imageNames.size(); j++)
+        {
+            // Avoiding self comparison
+            if (i == j)
+            {
+                continue;
+            }
+            if (startsWith(imageNames[j], identityPrefix))
+            {
+                continue;
+            }
+            attemptsNo++;
+            if (computeSimilarity(imageDescriptors[i], imageDescriptors[j]) > threshold)
+            {
+                acceptancesNo++;
+            }
+        }
+    }
+    //cout << acceptancesNo << "\n";
+    //cout << attemptsNo << "\n";
+
+    return acceptancesNo / attemptsNo;
 }

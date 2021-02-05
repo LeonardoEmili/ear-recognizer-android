@@ -8,8 +8,7 @@ import org.opencv.core.Core.flip
 import org.opencv.core.Mat
 import org.opencv.core.MatOfRect
 import org.opencv.core.Rect
-import org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY
-import org.opencv.imgproc.Imgproc.cvtColor
+import org.opencv.imgproc.Imgproc.*
 import org.opencv.objdetect.CascadeClassifier
 import java.io.File
 
@@ -56,7 +55,7 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
         cvtColor(image[0], grayImage, COLOR_BGR2GRAY);
         image[0] = grayImage
 
-    var outputSize = 96
+    val outputSize = 96
 
         // Checking left ear
         if (_detectROI(grayImage, leftCascade, ROI, false, outputSize)) {
@@ -72,8 +71,8 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
         // Horizontally flip the image and interpret it as the opposite ear
         var flipped = Mat();
         flip(image[0], flipped, 1);
-        cvtColor(flipped, grayImage, COLOR_BGR2GRAY);
-        image[0] = grayImage;
+        //cvtColor(flipped, grayImage, COLOR_BGR2GRAY);
+        image[0] = flipped //greyImage
 
         // Checking left (flipped) ear
         if (_detectROI(grayImage, leftCascade, ROI, false, outputSize)) {
@@ -111,10 +110,12 @@ ROI: ArrayList<Rect>, rightClassifier: Boolean, outputSize: Int): Boolean {
 
     var ears = MatOfRect()
 
+
     cascade!!.detectMultiScale(frameGray, ears);
 
 
     var earss = arrayListOf<Rect>()
+
 
     ears.toList().forEach {
         if (isValidROI(it, frameGray) &&

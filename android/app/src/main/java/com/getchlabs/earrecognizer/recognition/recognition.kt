@@ -19,7 +19,7 @@ fun recognize(bmp: Bitmap, context: Context): Bitmap? {
     var ROI = arrayListOf<Rect>()
     if (!detectROI(image, ROI, false, context)) return null
 
-    return matToBitmap(mat)
+    return matToBitmap(image[0]!!)
 
 }
 

@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.getchlabs.earrecognizer.recognition.recognize
 import org.opencv.android.OpenCVLoader
 import java.io.BufferedInputStream
 import java.io.InputStream
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             val bmp = BitmapFactory.decodeStream(bufferedInputStream);
 
 
-            imgEar.setImageBitmap(bmp)
+            imgEar.setImageBitmap(recognize(bmp, this))
 
         }
     }

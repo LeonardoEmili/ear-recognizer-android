@@ -95,7 +95,6 @@
         @{
             @defgroup core_hal_intrin_impl Private implementation helpers
         @}
-        @defgroup core_lowlevel_api Low-level API for external libraries / plugins
     @}
 @}
  */
@@ -149,7 +148,7 @@ It is possible to alternate error processing by using #redirectError().
 @param exc the exception raisen.
 @deprecated drop this version
  */
-CV_EXPORTS CV_NORETURN void error(const Exception& exc);
+CV_EXPORTS void error( const Exception& exc );
 
 enum SortFlags { SORT_EVERY_ROW    = 0, //!< each matrix row is sorted independently
                  SORT_EVERY_COLUMN = 1, //!< each matrix column is sorted
@@ -203,9 +202,6 @@ enum CovarFlags {
     COVAR_COLS      = 16
 };
 
-//! @addtogroup core_cluster
-//!  @{
-
 //! k-Means flags
 enum KmeansFlags {
     /** Select random initial centers in each attempt.*/
@@ -219,10 +215,26 @@ enum KmeansFlags {
     KMEANS_USE_INITIAL_LABELS = 1
 };
 
-//! @} core_cluster
+//! type of line
+enum LineTypes {
+    FILLED  = -1,
+    LINE_4  = 4, //!< 4-connected line
+    LINE_8  = 8, //!< 8-connected line
+    LINE_AA = 16 //!< antialiased line
+};
 
-//! @addtogroup core_array
-//! @{
+//! Only a subset of Hershey fonts <https://en.wikipedia.org/wiki/Hershey_fonts> are supported
+enum HersheyFonts {
+    FONT_HERSHEY_SIMPLEX        = 0, //!< normal size sans-serif font
+    FONT_HERSHEY_PLAIN          = 1, //!< small size sans-serif font
+    FONT_HERSHEY_DUPLEX         = 2, //!< normal size sans-serif font (more complex than FONT_HERSHEY_SIMPLEX)
+    FONT_HERSHEY_COMPLEX        = 3, //!< normal size serif font
+    FONT_HERSHEY_TRIPLEX        = 4, //!< normal size serif font (more complex than FONT_HERSHEY_COMPLEX)
+    FONT_HERSHEY_COMPLEX_SMALL  = 5, //!< smaller version of FONT_HERSHEY_COMPLEX
+    FONT_HERSHEY_SCRIPT_SIMPLEX = 6, //!< hand-writing style font
+    FONT_HERSHEY_SCRIPT_COMPLEX = 7, //!< more complex variant of FONT_HERSHEY_SCRIPT_SIMPLEX
+    FONT_ITALIC                 = 16 //!< flag for italic font
+};
 
 enum ReduceTypes { REDUCE_SUM = 0, //!< the output is the sum of all rows/columns of the matrix.
                    REDUCE_AVG = 1, //!< the output is the mean vector of all rows/columns of the matrix.
@@ -230,7 +242,6 @@ enum ReduceTypes { REDUCE_SUM = 0, //!< the output is the sum of all rows/column
                    REDUCE_MIN = 3  //!< the output is the minimum (column/row-wise) of all rows/columns of the matrix.
                  };
 
-//! @} core_array
 
 /** @brief Swaps two matrices
 */
@@ -429,13 +440,8 @@ The function cv::divide divides one array by another:
 or a scalar by an array when there is no src1 :
 \f[\texttt{dst(I) = saturate(scale/src2(I))}\f]
 
-Different channels of multi-channel arrays are processed independently.
-
-For integer types when src2(I) is zero, dst(I) will also be zero.
-
-@note In case of floating point data there is no special defined behavior for zero src2(I) values.
-Regular floating-point division is used.
-Expect correct IEEE-754 behaviour for floating-point data (with NaN, Inf result values).
+When src2(I) is zero, dst(I) will also be zero. Different channels of
+multi-channel arrays are processed independently.
 
 @note Saturation is not applied when the output array has the depth CV_32S. You may even get
 result of an incorrect sign in the case of overflow.
@@ -600,7 +606,7 @@ or
     // access pixel coordinates
     Point pnt = locations[i];
 @endcode
-@param src single-channel array
+@param src single-channel array (type CV_8UC1)
 @param idx the output array, type of cv::Mat or std::vector<Point>, corresponding to non-zero indices in the input
 */
 CV_EXPORTS_W void findNonZero( InputArray src, OutputArray idx );
@@ -700,8 +706,7 @@ CV_EXPORTS double norm( const SparseMat& src, int normType );
 
 /** @brief Computes the Peak Signal-to-Noise Ratio (PSNR) image quality metric.
 
-This function calculates the Peak Signal-to-Noise Ratio (PSNR) image quality metric in decibels (dB),
-between two input arrays src1 and src2. The arrays must have the same type.
+This function calculates the Peak Signal-to-Noise Ratio (PSNR) image quality metric in decibels (dB), between two input arrays src1 and src2. Arrays must have depth CV_8U.
 
 The PSNR is calculated as follows:
 
@@ -709,15 +714,13 @@ The PSNR is calculated as follows:
 \texttt{PSNR} = 10 \cdot \log_{10}{\left( \frac{R^2}{MSE} \right) }
 \f]
 
-where R is the maximum integer value of depth (e.g. 255 in the case of CV_8U data)
-and MSE is the mean squared error between the two arrays.
+where R is the maximum integer value of depth CV_8U (255) and MSE is the mean squared error between the two arrays.
 
 @param src1 first input array.
 @param src2 second input array of the same size as src1.
-@param R the maximum pixel value (255 by default)
 
   */
-CV_EXPORTS_W double PSNR(InputArray src1, InputArray src2, double R=255.);
+CV_EXPORTS_W double PSNR(InputArray src1, InputArray src2);
 
 /** @brief naive nearest neighbor finder
 
@@ -1360,17 +1363,6 @@ You may even get a negative value in the case of overflow.
 */
 CV_EXPORTS_W void absdiff(InputArray src1, InputArray src2, OutputArray dst);
 
-/** @brief  This is an overloaded member function, provided for convenience (python)
-Copies the matrix to another one.
-When the operation mask is specified, if the Mat::create call shown above reallocates the matrix, the newly allocated matrix is initialized with all zeros before copying the data.
-@param src source matrix.
-@param dst Destination matrix. If it does not have a proper size or type before the operation, it is
-reallocated.
-@param mask Operation mask of the same size as \*this. Its non-zero elements indicate which matrix
-elements need to be copied. The mask has to be of type CV_8U and can have 1 or multiple channels.
-*/
-
-void CV_EXPORTS_W copyTo(InputArray src, OutputArray dst, InputArray mask);
 /** @brief  Checks if array elements lie between the elements of two other arrays.
 
 The function checks the range as follows:
@@ -1623,9 +1615,7 @@ elements.
 CV_EXPORTS_W bool checkRange(InputArray a, bool quiet = true, CV_OUT Point* pos = 0,
                             double minVal = -DBL_MAX, double maxVal = DBL_MAX);
 
-/** @brief converts NaNs to the given number
-@param a input/output matrix (CV_32F type).
-@param val value to convert the NaNs
+/** @brief converts NaN's to the given number
 */
 CV_EXPORTS_W void patchNaNs(InputOutputArray a, double val = 0);
 
@@ -2617,6 +2607,7 @@ public:
     static Mat subspaceReconstruct(InputArray W, InputArray mean, InputArray src);
 
 protected:
+    bool _dataAsRow; // unused, but needed for 3.0 ABI compatibility.
     int _num_components;
     Mat _eigenvectors;
     Mat _eigenvalues;
@@ -3029,8 +3020,7 @@ public:
 class CV_EXPORTS Formatter
 {
 public:
-    enum FormatType {
-           FMT_DEFAULT = 0,
+    enum { FMT_DEFAULT = 0,
            FMT_MATLAB  = 1,
            FMT_CSV     = 2,
            FMT_PYTHON  = 3,
@@ -3042,12 +3032,11 @@ public:
 
     virtual Ptr<Formatted> format(const Mat& mtx) const = 0;
 
-    virtual void set16fPrecision(int p = 4) = 0;
     virtual void set32fPrecision(int p = 8) = 0;
     virtual void set64fPrecision(int p = 16) = 0;
     virtual void setMultiline(bool ml = true) = 0;
 
-    static Ptr<Formatter> get(Formatter::FormatType fmt = FMT_DEFAULT);
+    static Ptr<Formatter> get(int fmt = FMT_DEFAULT);
 
 };
 
@@ -3070,7 +3059,7 @@ String& operator << (String& out, const Mat& mtx)
 
 class CV_EXPORTS Algorithm;
 
-template<typename _Tp, typename _EnumTp = void> struct ParamType {};
+template<typename _Tp> struct ParamType {};
 
 
 /** @brief This is a base class for all more or less complex algorithms in OpenCV
@@ -3183,9 +3172,9 @@ protected:
     void writeFormat(FileStorage& fs) const;
 };
 
-enum struct Param {
-    INT=0, BOOLEAN=1, REAL=2, STRING=3, MAT=4, MAT_VECTOR=5, ALGORITHM=6, FLOAT=7,
-    UNSIGNED_INT=8, UINT64=9, UCHAR=11, SCALAR=12
+struct Param {
+    enum { INT=0, BOOLEAN=1, REAL=2, STRING=3, MAT=4, MAT_VECTOR=5, ALGORITHM=6, FLOAT=7,
+           UNSIGNED_INT=8, UINT64=9, UCHAR=11, SCALAR=12 };
 };
 
 
@@ -3195,7 +3184,7 @@ template<> struct ParamType<bool>
     typedef bool const_param_type;
     typedef bool member_type;
 
-    static const Param type = Param::BOOLEAN;
+    enum { type = Param::BOOLEAN };
 };
 
 template<> struct ParamType<int>
@@ -3203,7 +3192,7 @@ template<> struct ParamType<int>
     typedef int const_param_type;
     typedef int member_type;
 
-    static const Param type = Param::INT;
+    enum { type = Param::INT };
 };
 
 template<> struct ParamType<double>
@@ -3211,7 +3200,7 @@ template<> struct ParamType<double>
     typedef double const_param_type;
     typedef double member_type;
 
-    static const Param type = Param::REAL;
+    enum { type = Param::REAL };
 };
 
 template<> struct ParamType<String>
@@ -3219,7 +3208,7 @@ template<> struct ParamType<String>
     typedef const String& const_param_type;
     typedef String member_type;
 
-    static const Param type = Param::STRING;
+    enum { type = Param::STRING };
 };
 
 template<> struct ParamType<Mat>
@@ -3227,7 +3216,7 @@ template<> struct ParamType<Mat>
     typedef const Mat& const_param_type;
     typedef Mat member_type;
 
-    static const Param type = Param::MAT;
+    enum { type = Param::MAT };
 };
 
 template<> struct ParamType<std::vector<Mat> >
@@ -3235,7 +3224,7 @@ template<> struct ParamType<std::vector<Mat> >
     typedef const std::vector<Mat>& const_param_type;
     typedef std::vector<Mat> member_type;
 
-    static const Param type = Param::MAT_VECTOR;
+    enum { type = Param::MAT_VECTOR };
 };
 
 template<> struct ParamType<Algorithm>
@@ -3243,7 +3232,7 @@ template<> struct ParamType<Algorithm>
     typedef const Ptr<Algorithm>& const_param_type;
     typedef Ptr<Algorithm> member_type;
 
-    static const Param type = Param::ALGORITHM;
+    enum { type = Param::ALGORITHM };
 };
 
 template<> struct ParamType<float>
@@ -3251,7 +3240,7 @@ template<> struct ParamType<float>
     typedef float const_param_type;
     typedef float member_type;
 
-    static const Param type = Param::FLOAT;
+    enum { type = Param::FLOAT };
 };
 
 template<> struct ParamType<unsigned>
@@ -3259,7 +3248,7 @@ template<> struct ParamType<unsigned>
     typedef unsigned const_param_type;
     typedef unsigned member_type;
 
-    static const Param type = Param::UNSIGNED_INT;
+    enum { type = Param::UNSIGNED_INT };
 };
 
 template<> struct ParamType<uint64>
@@ -3267,7 +3256,7 @@ template<> struct ParamType<uint64>
     typedef uint64 const_param_type;
     typedef uint64 member_type;
 
-    static const Param type = Param::UINT64;
+    enum { type = Param::UINT64 };
 };
 
 template<> struct ParamType<uchar>
@@ -3275,7 +3264,7 @@ template<> struct ParamType<uchar>
     typedef uchar const_param_type;
     typedef uchar member_type;
 
-    static const Param type = Param::UCHAR;
+    enum { type = Param::UCHAR };
 };
 
 template<> struct ParamType<Scalar>
@@ -3283,16 +3272,7 @@ template<> struct ParamType<Scalar>
     typedef const Scalar& const_param_type;
     typedef Scalar member_type;
 
-    static const Param type = Param::SCALAR;
-};
-
-template<typename _Tp>
-struct ParamType<_Tp, typename std::enable_if< std::is_enum<_Tp>::value >::type>
-{
-    typedef typename std::underlying_type<_Tp>::type const_param_type;
-    typedef typename std::underlying_type<_Tp>::type member_type;
-
-    static const Param type = Param::INT;
+    enum { type = Param::SCALAR };
 };
 
 //! @} core_basic

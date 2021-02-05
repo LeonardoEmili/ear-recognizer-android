@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Ear_Recognizer.iml" filepath="$PROJECT_DIR$/.idea/modules/Ear_Recognizer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Ear_Recognizer.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Ear_Recognizer.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary451/Ear_Recognizer.openCVLibrary451.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary451/Ear_Recognizer.openCVLibrary451.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary3410/Ear_Recognizer.openCVLibrary3410.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary3410/Ear_Recognizer.openCVLibrary3410.iml" />
     </modules>
   </component>
 </project>

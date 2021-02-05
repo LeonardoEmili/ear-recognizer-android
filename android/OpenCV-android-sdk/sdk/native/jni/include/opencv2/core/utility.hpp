@@ -56,10 +56,8 @@
 #include "opencv2/core.hpp"
 #include <ostream>
 
+#ifdef CV_CXX11
 #include <functional>
-
-#if !defined(_M_CEE)
-#include <mutex>  // std::mutex, std::lock_guard
 #endif
 
 namespace cv
@@ -284,98 +282,107 @@ CV_EXPORTS_W double getTickFrequency();
 
 The class computes passing time by counting the number of ticks per second. That is, the following code computes the
 execution time in seconds:
-@snippet snippets/core_various.cpp TickMeter_total
+@code
+TickMeter tm;
+tm.start();
+// do something ...
+tm.stop();
+std::cout << tm.getTimeSec();
+@endcode
 
 It is also possible to compute the average time over multiple runs:
-@snippet snippets/core_various.cpp TickMeter_average
-
+@code
+TickMeter tm;
+for (int i = 0; i < 100; i++)
+{
+    tm.start();
+    // do something ...
+    tm.stop();
+}
+double average_time = tm.getTimeSec() / tm.getCounter();
+std::cout << "Average time in second per iteration is: " << average_time << std::endl;
+@endcode
 @sa getTickCount, getTickFrequency
 */
+
 class CV_EXPORTS_W TickMeter
 {
 public:
     //! the default constructor
     CV_WRAP TickMeter()
     {
-        reset();
+    reset();
     }
 
-    //! starts counting ticks.
+    /**
+    starts counting ticks.
+    */
     CV_WRAP void start()
     {
-        startTime = cv::getTickCount();
+    startTime = cv::getTickCount();
     }
 
-    //! stops counting ticks.
+    /**
+    stops counting ticks.
+    */
     CV_WRAP void stop()
     {
-        int64 time = cv::getTickCount();
-        if (startTime == 0)
-            return;
-        ++counter;
-        sumTime += (time - startTime);
-        startTime = 0;
+    int64 time = cv::getTickCount();
+    if (startTime == 0)
+    return;
+    ++counter;
+    sumTime += (time - startTime);
+    startTime = 0;
     }
 
-    //! returns counted ticks.
+    /**
+    returns counted ticks.
+    */
     CV_WRAP int64 getTimeTicks() const
     {
-        return sumTime;
+    return sumTime;
     }
 
-    //! returns passed time in microseconds.
+    /**
+    returns passed time in microseconds.
+    */
     CV_WRAP double getTimeMicro() const
     {
-        return getTimeMilli()*1e3;
+    return getTimeMilli()*1e3;
     }
 
-    //! returns passed time in milliseconds.
+    /**
+    returns passed time in milliseconds.
+    */
     CV_WRAP double getTimeMilli() const
     {
-        return getTimeSec()*1e3;
+    return getTimeSec()*1e3;
     }
 
-    //! returns passed time in seconds.
+    /**
+    returns passed time in seconds.
+    */
     CV_WRAP double getTimeSec()   const
     {
-        return (double)getTimeTicks() / getTickFrequency();
+    return (double)getTimeTicks() / getTickFrequency();
     }
 
-    //! returns internal counter value.
+    /**
+    returns internal counter value.
+    */
     CV_WRAP int64 getCounter() const
     {
-        return counter;
+    return counter;
     }
 
-    //! returns average FPS (frames per second) value.
-    CV_WRAP double getFPS() const
-    {
-        const double sec = getTimeSec();
-        if (sec < DBL_EPSILON)
-            return 0.;
-        return counter / sec;
-    }
-
-    //! returns average time in seconds
-    CV_WRAP double getAvgTimeSec() const
-    {
-        if (counter <= 0)
-            return 0.;
-        return getTimeSec() / counter;
-    }
-
-    //! returns average time in milliseconds
-    CV_WRAP double getAvgTimeMilli() const
-    {
-        return getAvgTimeSec() * 1e3;
-    }
-
-    //! resets internal values.
+    /**
+    resets internal values.
+    */
     CV_WRAP void reset()
     {
-        startTime = 0;
-        sumTime = 0;
-        counter = 0;
+    startTime = 0;
+    sumTime = 0;
+    counter = 0;
     }
 
 private:
@@ -582,6 +589,7 @@ public:
 */
 CV_EXPORTS void parallel_for_(const Range& range, const ParallelLoopBody& body, double nstripes=-1.);
 
+#ifdef CV_CXX11
 class ParallelLoopBodyLambdaWrapper : public ParallelLoopBody
 {
 private:
@@ -601,6 +609,7 @@ inline void parallel_for_(const Range& range, std::function<void(const Range&)> 
 {
     parallel_for_(range, ParallelLoopBodyLambdaWrapper(functor), nstripes);
 }
+#endif
 
 /////////////////////////////// forEach method of cv::Mat ////////////////////////////
 template<typename _Tp, typename Functor> inline
@@ -613,7 +622,6 @@ void Mat::forEach_impl(const Functor& operation) {
         //  or (_Tp&, void*)        <- in case you don't need current idx.
     }
 
-    CV_Assert(!empty());
     CV_Assert(this->total() / this->size[this->dims - 1] <= INT_MAX);
     const int LINES = static_cast<int>(this->total() / this->size[this->dims - 1]);
 
@@ -702,10 +710,34 @@ void Mat::forEach_impl(const Functor& operation) {
 
 /////////////////////////// Synchronization Primitives ///////////////////////////////
 
-#if !defined(_M_CEE)
-typedef std::recursive_mutex Mutex;
-typedef std::lock_guard<cv::Mutex> AutoLock;
-#endif
+class CV_EXPORTS Mutex
+{
+public:
+    Mutex();
+    ~Mutex();
+    Mutex(const Mutex& m);
+    Mutex& operator = (const Mutex& m);
+
+    void lock();
+    bool trylock();
+    void unlock();
+
+    struct Impl;
+protected:
+    Impl* impl;
+};
+
+class CV_EXPORTS AutoLock
+{
+public:
+    AutoLock(Mutex& m) : mutex(&m) { mutex->lock(); }
+    ~AutoLock() { mutex->unlock(); }
+protected:
+    Mutex* mutex;
+private:
+    AutoLock(const AutoLock&);
+    AutoLock& operator = (const AutoLock&);
+};
 
 
 /** @brief Designed for command line parsing
@@ -925,8 +957,8 @@ public:
     void printErrors() const;
 
 protected:
-    void getByName(const String& name, bool space_delete, Param type, void* dst) const;
-    void getByIndex(int index, bool space_delete, Param type, void* dst) const;
+    void getByName(const String& name, bool space_delete, int type, void* dst) const;
+    void getByIndex(int index, bool space_delete, int type, void* dst) const;
 
     struct Impl;
     Impl* impl;
@@ -1034,6 +1066,15 @@ AutoBuffer<_Tp, fixed_size>::resize(size_t _size)
 template<typename _Tp, size_t fixed_size> inline size_t
 AutoBuffer<_Tp, fixed_size>::size() const
 { return sz; }
+
+template<> inline std::string CommandLineParser::get<std::string>(int index, bool space_delete) const
+{
+    return get<String>(index, space_delete);
+}
+template<> inline std::string CommandLineParser::get<std::string>(const String& name, bool space_delete) const
+{
+    return get<String>(name, space_delete);
+}
 
 //! @endcond
 
@@ -1195,6 +1236,10 @@ CV_EXPORTS int getThreadID();
 #else
 /// Collect implementation data on OpenCV function call. Requires ENABLE_IMPL_COLLECTION build option.
 #define CV_IMPL_ADD(impl)
+#endif
+
+#ifndef DISABLE_OPENCV_24_COMPATIBILITY
+#include "opencv2/core/core_c.h"
 #endif
 
 #endif //OPENCV_CORE_UTILITY_H

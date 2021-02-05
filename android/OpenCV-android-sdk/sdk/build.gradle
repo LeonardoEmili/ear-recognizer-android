@@ -49,7 +49,7 @@
 // - avoid using of "OpenCVLoader.initAsync()" approach - it is deprecated
 //   It may load library with different version (from OpenCV Android Manager, which is installed separatelly on device)
 //
-// - use "System.loadLibrary("opencv_java4")" or "OpenCVLoader.initDebug()"
+// - use "System.loadLibrary("opencv_java3")" or "OpenCVLoader.initDebug()"
 //   TODO: Add accurate API to load OpenCV native library
 //
 //
@@ -81,48 +81,28 @@
 //   splits {
 //       abi {
 //           enable true
-//           universalApk false
 //           reset()
 //           include 'armeabi-v7a' // , 'x86', 'x86_64', 'arm64-v8a'
+//           universalApk false
 //       }
 //   }
 //
 
 apply plugin: 'com.android.library'
 
-def openCVersionName = "4.5.1"
-def openCVersionCode = ((4 * 100 + 5) * 100 + 1) * 10 + 0
-
-println "OpenCV: " +openCVersionName + " " + project.buildscript.sourceFile
+println "OpenCV: " + project.buildscript.sourceFile
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
+    //buildToolsVersion "27.0.3" // not needed since com.android.tools.build:gradle:3.0.0
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 26
-
-        versionCode openCVersionCode
-        versionName openCVersionName
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_STL=c++_shared"
-                targets "opencv_jni_shared"
-            }
-        }
+        minSdkVersion 14
+        targetSdkVersion 21
     }
 
     buildTypes {
-        debug {
-            packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
-            }
-        }
         release {
-            packagingOptions {
-                doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
-            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
@@ -139,12 +119,6 @@ android {
             aidl.srcDirs = ['java/src']
             res.srcDirs = ['java/res']
             manifest.srcFile 'java/AndroidManifest.xml'
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path (project.projectDir.toString() + '/libcxx_helper/CMakeLists.txt')
         }
     }
 }

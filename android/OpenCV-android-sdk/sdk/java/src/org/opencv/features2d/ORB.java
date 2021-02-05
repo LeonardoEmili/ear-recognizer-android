@@ -22,15 +22,14 @@ public class ORB extends Feature2D {
     // internal usage only
     public static ORB __fromPtr__(long addr) { return new ORB(addr); }
 
-    // C++: enum <unnamed>
+    // C++: enum ScoreType (cv.ORB.ScoreType)
     public static final int
-            kBytes = 32,
             HARRIS_SCORE = 0,
             FAST_SCORE = 1;
 
 
     //
-    // C++: static Ptr_ORB cv::ORB::create(int nfeatures = 500, float scaleFactor = 1.2f, int nlevels = 8, int edgeThreshold = 31, int firstLevel = 0, int WTA_K = 2, int scoreType = ORB::HARRIS_SCORE, int patchSize = 31, int fastThreshold = 20)
+    // C++: static Ptr_ORB cv::ORB::create(int nfeatures = 500, float scaleFactor = 1.2f, int nlevels = 8, int edgeThreshold = 31, int firstLevel = 0, int WTA_K = 2, ORB_ScoreType scoreType = ORB::HARRIS_SCORE, int patchSize = 31, int fastThreshold = 20)
     //
 
     /**
@@ -360,47 +359,11 @@ public class ORB extends Feature2D {
 
 
     //
-    // C++:  String cv::ORB::getDefaultName()
+    // C++:  void cv::ORB::setMaxFeatures(int maxFeatures)
     //
 
-    public String getDefaultName() {
-        return getDefaultName_0(nativeObj);
-    }
-
-
-    //
-    // C++:  double cv::ORB::getScaleFactor()
-    //
-
-    public double getScaleFactor() {
-        return getScaleFactor_0(nativeObj);
-    }
-
-
-    //
-    // C++:  int cv::ORB::getEdgeThreshold()
-    //
-
-    public int getEdgeThreshold() {
-        return getEdgeThreshold_0(nativeObj);
-    }
-
-
-    //
-    // C++:  int cv::ORB::getFastThreshold()
-    //
-
-    public int getFastThreshold() {
-        return getFastThreshold_0(nativeObj);
-    }
-
-
-    //
-    // C++:  int cv::ORB::getFirstLevel()
-    //
-
-    public int getFirstLevel() {
-        return getFirstLevel_0(nativeObj);
+    public void setMaxFeatures(int maxFeatures) {
+        setMaxFeatures_0(nativeObj, maxFeatures);
     }
 
 
@@ -414,74 +377,20 @@ public class ORB extends Feature2D {
 
 
     //
-    // C++:  int cv::ORB::getNLevels()
+    // C++:  void cv::ORB::setScaleFactor(double scaleFactor)
     //
 
-    public int getNLevels() {
-        return getNLevels_0(nativeObj);
+    public void setScaleFactor(double scaleFactor) {
+        setScaleFactor_0(nativeObj, scaleFactor);
     }
 
 
     //
-    // C++:  int cv::ORB::getPatchSize()
+    // C++:  double cv::ORB::getScaleFactor()
     //
 
-    public int getPatchSize() {
-        return getPatchSize_0(nativeObj);
-    }
-
-
-    //
-    // C++:  int cv::ORB::getScoreType()
-    //
-
-    public int getScoreType() {
-        return getScoreType_0(nativeObj);
-    }
-
-
-    //
-    // C++:  int cv::ORB::getWTA_K()
-    //
-
-    public int getWTA_K() {
-        return getWTA_K_0(nativeObj);
-    }
-
-
-    //
-    // C++:  void cv::ORB::setEdgeThreshold(int edgeThreshold)
-    //
-
-    public void setEdgeThreshold(int edgeThreshold) {
-        setEdgeThreshold_0(nativeObj, edgeThreshold);
-    }
-
-
-    //
-    // C++:  void cv::ORB::setFastThreshold(int fastThreshold)
-    //
-
-    public void setFastThreshold(int fastThreshold) {
-        setFastThreshold_0(nativeObj, fastThreshold);
-    }
-
-
-    //
-    // C++:  void cv::ORB::setFirstLevel(int firstLevel)
-    //
-
-    public void setFirstLevel(int firstLevel) {
-        setFirstLevel_0(nativeObj, firstLevel);
-    }
-
-
-    //
-    // C++:  void cv::ORB::setMaxFeatures(int maxFeatures)
-    //
-
-    public void setMaxFeatures(int maxFeatures) {
-        setMaxFeatures_0(nativeObj, maxFeatures);
+    public double getScaleFactor() {
+        return getScaleFactor_0(nativeObj);
     }
 
 
@@ -495,29 +404,47 @@ public class ORB extends Feature2D {
 
 
     //
-    // C++:  void cv::ORB::setPatchSize(int patchSize)
+    // C++:  int cv::ORB::getNLevels()
     //
 
-    public void setPatchSize(int patchSize) {
-        setPatchSize_0(nativeObj, patchSize);
+    public int getNLevels() {
+        return getNLevels_0(nativeObj);
     }
 
 
     //
-    // C++:  void cv::ORB::setScaleFactor(double scaleFactor)
+    // C++:  void cv::ORB::setEdgeThreshold(int edgeThreshold)
     //
 
-    public void setScaleFactor(double scaleFactor) {
-        setScaleFactor_0(nativeObj, scaleFactor);
+    public void setEdgeThreshold(int edgeThreshold) {
+        setEdgeThreshold_0(nativeObj, edgeThreshold);
     }
 
 
     //
-    // C++:  void cv::ORB::setScoreType(int scoreType)
+    // C++:  int cv::ORB::getEdgeThreshold()
     //
 
-    public void setScoreType(int scoreType) {
-        setScoreType_0(nativeObj, scoreType);
+    public int getEdgeThreshold() {
+        return getEdgeThreshold_0(nativeObj);
+    }
+
+
+    //
+    // C++:  void cv::ORB::setFirstLevel(int firstLevel)
+    //
+
+    public void setFirstLevel(int firstLevel) {
+        setFirstLevel_0(nativeObj, firstLevel);
+    }
+
+
+    //
+    // C++:  int cv::ORB::getFirstLevel()
+    //
+
+    public int getFirstLevel() {
+        return getFirstLevel_0(nativeObj);
     }
 
 
@@ -530,6 +457,78 @@ public class ORB extends Feature2D {
     }
 
 
+    //
+    // C++:  int cv::ORB::getWTA_K()
+    //
+
+    public int getWTA_K() {
+        return getWTA_K_0(nativeObj);
+    }
+
+
+    //
+    // C++:  void cv::ORB::setScoreType(ORB_ScoreType scoreType)
+    //
+
+    public void setScoreType(int scoreType) {
+        setScoreType_0(nativeObj, scoreType);
+    }
+
+
+    //
+    // C++:  ORB_ScoreType cv::ORB::getScoreType()
+    //
+
+    public int getScoreType() {
+        return getScoreType_0(nativeObj);
+    }
+
+
+    //
+    // C++:  void cv::ORB::setPatchSize(int patchSize)
+    //
+
+    public void setPatchSize(int patchSize) {
+        setPatchSize_0(nativeObj, patchSize);
+    }
+
+
+    //
+    // C++:  int cv::ORB::getPatchSize()
+    //
+
+    public int getPatchSize() {
+        return getPatchSize_0(nativeObj);
+    }
+
+
+    //
+    // C++:  void cv::ORB::setFastThreshold(int fastThreshold)
+    //
+
+    public void setFastThreshold(int fastThreshold) {
+        setFastThreshold_0(nativeObj, fastThreshold);
+    }
+
+
+    //
+    // C++:  int cv::ORB::getFastThreshold()
+    //
+
+    public int getFastThreshold() {
+        return getFastThreshold_0(nativeObj);
+    }
+
+
+    //
+    // C++:  String cv::ORB::getDefaultName()
+    //
+
+    public String getDefaultName() {
+        return getDefaultName_0(nativeObj);
+    }
+
+
     @Override
     protected void finalize() throws Throwable {
         delete(nativeObj);
@@ -537,7 +536,7 @@ public class ORB extends Feature2D {
 
 
 
-    // C++: static Ptr_ORB cv::ORB::create(int nfeatures = 500, float scaleFactor = 1.2f, int nlevels = 8, int edgeThreshold = 31, int firstLevel = 0, int WTA_K = 2, int scoreType = ORB::HARRIS_SCORE, int patchSize = 31, int fastThreshold = 20)
+    // C++: static Ptr_ORB cv::ORB::create(int nfeatures = 500, float scaleFactor = 1.2f, int nlevels = 8, int edgeThreshold = 31, int firstLevel = 0, int WTA_K = 2, ORB_ScoreType scoreType = ORB::HARRIS_SCORE, int patchSize = 31, int fastThreshold = 20)
     private static native long create_0(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize, int fastThreshold);
     private static native long create_1(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType, int patchSize);
     private static native long create_2(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, int WTA_K, int scoreType);
@@ -549,62 +548,62 @@ public class ORB extends Feature2D {
     private static native long create_8(int nfeatures);
     private static native long create_9();
 
-    // C++:  String cv::ORB::getDefaultName()
-    private static native String getDefaultName_0(long nativeObj);
-
-    // C++:  double cv::ORB::getScaleFactor()
-    private static native double getScaleFactor_0(long nativeObj);
-
-    // C++:  int cv::ORB::getEdgeThreshold()
-    private static native int getEdgeThreshold_0(long nativeObj);
-
-    // C++:  int cv::ORB::getFastThreshold()
-    private static native int getFastThreshold_0(long nativeObj);
-
-    // C++:  int cv::ORB::getFirstLevel()
-    private static native int getFirstLevel_0(long nativeObj);
+    // C++:  void cv::ORB::setMaxFeatures(int maxFeatures)
+    private static native void setMaxFeatures_0(long nativeObj, int maxFeatures);
 
     // C++:  int cv::ORB::getMaxFeatures()
     private static native int getMaxFeatures_0(long nativeObj);
 
-    // C++:  int cv::ORB::getNLevels()
-    private static native int getNLevels_0(long nativeObj);
+    // C++:  void cv::ORB::setScaleFactor(double scaleFactor)
+    private static native void setScaleFactor_0(long nativeObj, double scaleFactor);
 
-    // C++:  int cv::ORB::getPatchSize()
-    private static native int getPatchSize_0(long nativeObj);
-
-    // C++:  int cv::ORB::getScoreType()
-    private static native int getScoreType_0(long nativeObj);
-
-    // C++:  int cv::ORB::getWTA_K()
-    private static native int getWTA_K_0(long nativeObj);
-
-    // C++:  void cv::ORB::setEdgeThreshold(int edgeThreshold)
-    private static native void setEdgeThreshold_0(long nativeObj, int edgeThreshold);
-
-    // C++:  void cv::ORB::setFastThreshold(int fastThreshold)
-    private static native void setFastThreshold_0(long nativeObj, int fastThreshold);
-
-    // C++:  void cv::ORB::setFirstLevel(int firstLevel)
-    private static native void setFirstLevel_0(long nativeObj, int firstLevel);
-
-    // C++:  void cv::ORB::setMaxFeatures(int maxFeatures)
-    private static native void setMaxFeatures_0(long nativeObj, int maxFeatures);
+    // C++:  double cv::ORB::getScaleFactor()
+    private static native double getScaleFactor_0(long nativeObj);
 
     // C++:  void cv::ORB::setNLevels(int nlevels)
     private static native void setNLevels_0(long nativeObj, int nlevels);
 
-    // C++:  void cv::ORB::setPatchSize(int patchSize)
-    private static native void setPatchSize_0(long nativeObj, int patchSize);
+    // C++:  int cv::ORB::getNLevels()
+    private static native int getNLevels_0(long nativeObj);
 
-    // C++:  void cv::ORB::setScaleFactor(double scaleFactor)
-    private static native void setScaleFactor_0(long nativeObj, double scaleFactor);
+    // C++:  void cv::ORB::setEdgeThreshold(int edgeThreshold)
+    private static native void setEdgeThreshold_0(long nativeObj, int edgeThreshold);
 
-    // C++:  void cv::ORB::setScoreType(int scoreType)
-    private static native void setScoreType_0(long nativeObj, int scoreType);
+    // C++:  int cv::ORB::getEdgeThreshold()
+    private static native int getEdgeThreshold_0(long nativeObj);
+
+    // C++:  void cv::ORB::setFirstLevel(int firstLevel)
+    private static native void setFirstLevel_0(long nativeObj, int firstLevel);
+
+    // C++:  int cv::ORB::getFirstLevel()
+    private static native int getFirstLevel_0(long nativeObj);
 
     // C++:  void cv::ORB::setWTA_K(int wta_k)
     private static native void setWTA_K_0(long nativeObj, int wta_k);
+
+    // C++:  int cv::ORB::getWTA_K()
+    private static native int getWTA_K_0(long nativeObj);
+
+    // C++:  void cv::ORB::setScoreType(ORB_ScoreType scoreType)
+    private static native void setScoreType_0(long nativeObj, int scoreType);
+
+    // C++:  ORB_ScoreType cv::ORB::getScoreType()
+    private static native int getScoreType_0(long nativeObj);
+
+    // C++:  void cv::ORB::setPatchSize(int patchSize)
+    private static native void setPatchSize_0(long nativeObj, int patchSize);
+
+    // C++:  int cv::ORB::getPatchSize()
+    private static native int getPatchSize_0(long nativeObj);
+
+    // C++:  void cv::ORB::setFastThreshold(int fastThreshold)
+    private static native void setFastThreshold_0(long nativeObj, int fastThreshold);
+
+    // C++:  int cv::ORB::getFastThreshold()
+    private static native int getFastThreshold_0(long nativeObj);
+
+    // C++:  String cv::ORB::getDefaultName()
+    private static native String getDefaultName_0(long nativeObj);
 
     // native support for java finalize()
     private static native void delete(long nativeObj);

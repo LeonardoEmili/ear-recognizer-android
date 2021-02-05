@@ -23,38 +23,6 @@ public class LineSegmentDetector extends Algorithm {
     public static LineSegmentDetector __fromPtr__(long addr) { return new LineSegmentDetector(addr); }
 
     //
-    // C++:  int cv::LineSegmentDetector::compareSegments(Size size, Mat lines1, Mat lines2, Mat& _image = Mat())
-    //
-
-    /**
-     * Draws two groups of lines in blue and red, counting the non overlapping (mismatching) pixels.
-     *
-     *     @param size The size of the image, where lines1 and lines2 were found.
-     *     @param lines1 The first group of lines that needs to be drawn. It is visualized in blue color.
-     *     @param lines2 The second group of lines. They visualized in red color.
-     *     @param _image Optional image, where the lines will be drawn. The image should be color(3-channel)
-     *     in order for lines1 and lines2 to be drawn in the above mentioned colors.
-     * @return automatically generated
-     */
-    public int compareSegments(Size size, Mat lines1, Mat lines2, Mat _image) {
-        return compareSegments_0(nativeObj, size.width, size.height, lines1.nativeObj, lines2.nativeObj, _image.nativeObj);
-    }
-
-    /**
-     * Draws two groups of lines in blue and red, counting the non overlapping (mismatching) pixels.
-     *
-     *     @param size The size of the image, where lines1 and lines2 were found.
-     *     @param lines1 The first group of lines that needs to be drawn. It is visualized in blue color.
-     *     @param lines2 The second group of lines. They visualized in red color.
-     *     in order for lines1 and lines2 to be drawn in the above mentioned colors.
-     * @return automatically generated
-     */
-    public int compareSegments(Size size, Mat lines1, Mat lines2) {
-        return compareSegments_1(nativeObj, size.width, size.height, lines1.nativeObj, lines2.nativeObj);
-    }
-
-
-    //
     // C++:  void cv::LineSegmentDetector::detect(Mat _image, Mat& _lines, Mat& width = Mat(), Mat& prec = Mat(), Mat& nfa = Mat())
     //
 
@@ -200,16 +168,44 @@ public class LineSegmentDetector extends Algorithm {
     }
 
 
+    //
+    // C++:  int cv::LineSegmentDetector::compareSegments(Size size, Mat lines1, Mat lines2, Mat& _image = Mat())
+    //
+
+    /**
+     * Draws two groups of lines in blue and red, counting the non overlapping (mismatching) pixels.
+     *
+     *     @param size The size of the image, where lines1 and lines2 were found.
+     *     @param lines1 The first group of lines that needs to be drawn. It is visualized in blue color.
+     *     @param lines2 The second group of lines. They visualized in red color.
+     *     @param _image Optional image, where the lines will be drawn. The image should be color(3-channel)
+     *     in order for lines1 and lines2 to be drawn in the above mentioned colors.
+     * @return automatically generated
+     */
+    public int compareSegments(Size size, Mat lines1, Mat lines2, Mat _image) {
+        return compareSegments_0(nativeObj, size.width, size.height, lines1.nativeObj, lines2.nativeObj, _image.nativeObj);
+    }
+
+    /**
+     * Draws two groups of lines in blue and red, counting the non overlapping (mismatching) pixels.
+     *
+     *     @param size The size of the image, where lines1 and lines2 were found.
+     *     @param lines1 The first group of lines that needs to be drawn. It is visualized in blue color.
+     *     @param lines2 The second group of lines. They visualized in red color.
+     *     in order for lines1 and lines2 to be drawn in the above mentioned colors.
+     * @return automatically generated
+     */
+    public int compareSegments(Size size, Mat lines1, Mat lines2) {
+        return compareSegments_1(nativeObj, size.width, size.height, lines1.nativeObj, lines2.nativeObj);
+    }
+
+
     @Override
     protected void finalize() throws Throwable {
         delete(nativeObj);
     }
 
 
-
-    // C++:  int cv::LineSegmentDetector::compareSegments(Size size, Mat lines1, Mat lines2, Mat& _image = Mat())
-    private static native int compareSegments_0(long nativeObj, double size_width, double size_height, long lines1_nativeObj, long lines2_nativeObj, long _image_nativeObj);
-    private static native int compareSegments_1(long nativeObj, double size_width, double size_height, long lines1_nativeObj, long lines2_nativeObj);
 
     // C++:  void cv::LineSegmentDetector::detect(Mat _image, Mat& _lines, Mat& width = Mat(), Mat& prec = Mat(), Mat& nfa = Mat())
     private static native void detect_0(long nativeObj, long _image_nativeObj, long _lines_nativeObj, long width_nativeObj, long prec_nativeObj, long nfa_nativeObj);
@@ -219,6 +215,10 @@ public class LineSegmentDetector extends Algorithm {
 
     // C++:  void cv::LineSegmentDetector::drawSegments(Mat& _image, Mat lines)
     private static native void drawSegments_0(long nativeObj, long _image_nativeObj, long lines_nativeObj);
+
+    // C++:  int cv::LineSegmentDetector::compareSegments(Size size, Mat lines1, Mat lines2, Mat& _image = Mat())
+    private static native int compareSegments_0(long nativeObj, double size_width, double size_height, long lines1_nativeObj, long lines2_nativeObj, long _image_nativeObj);
+    private static native int compareSegments_1(long nativeObj, double size_width, double size_height, long lines1_nativeObj, long lines2_nativeObj);
 
     // native support for java finalize()
     private static native void delete(long nativeObj);

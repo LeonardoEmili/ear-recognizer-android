@@ -7,7 +7,9 @@ import org.opencv.core.Algorithm;
 import org.opencv.core.Mat;
 
 // C++: class DenseOpticalFlow
-
+/**
+ * Base class for dense optical flow algorithms
+ */
 public class DenseOpticalFlow extends Algorithm {
 
     protected DenseOpticalFlow(long addr) { super(addr); }

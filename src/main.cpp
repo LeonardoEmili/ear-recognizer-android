@@ -34,7 +34,7 @@ void evaluate()
         double far = calculateVerificationFAR(descriptors, imageNames, threshold);
         cout << "FAR: " << far << "\n\n";
         FARs.push_back(far);
-        threshold -= 0.2;
+        threshold -= 0.01;
     }
     cout << "Thresholds: ";
     for (double threshold : thresholds)

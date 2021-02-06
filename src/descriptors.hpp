@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 
 #include <opencv2/dnn.hpp>
 #include <opencv2/features2d.hpp>

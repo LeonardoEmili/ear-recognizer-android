@@ -52,3 +52,7 @@ run-ami:
 
 runa:
 	@make run-ami OPENCV_SAMPLES_DATA_PATH=/usr/local/Cellar/opencv/4.5.0_5/share/opencv4/haarcascades
+
+rune:
+	@make build > /dev/null
+	@./build/GalleryGenerator datasets/AMI/ 1

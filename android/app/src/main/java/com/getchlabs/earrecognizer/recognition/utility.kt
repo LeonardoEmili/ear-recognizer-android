@@ -4,11 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import org.opencv.android.Utils
-import org.opencv.core.CvException
-import org.opencv.core.CvType
-import org.opencv.core.Mat
-import org.opencv.core.Scalar
+import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import org.opencv.imgproc.Imgproc.accumulate
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -70,4 +68,14 @@ fun saveHaarCascadesAsFiles(context: Context) {
         os.close()
     } catch (e: IOException) {
     }
+}
+
+fun computeCentroid(points: ArrayList<Point>): Point {
+    var x = 0.0
+    var y = 0.0
+    for (point in points) {
+        x+=point.x
+        y+=point.y
+    }
+    return Point(x/points.size, y/points.size)
 }

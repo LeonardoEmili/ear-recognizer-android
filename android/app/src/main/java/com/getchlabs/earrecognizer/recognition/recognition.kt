@@ -2,8 +2,8 @@ package com.getchlabs.earrecognizer.recognition
 
 import android.content.Context
 import android.graphics.Bitmap
-import org.opencv.android.Utils
 import org.opencv.core.Mat
+import org.opencv.core.Point
 import org.opencv.core.Rect
 
 
@@ -19,7 +19,15 @@ fun recognize(bmp: Bitmap, context: Context): Bitmap? {
     var ROI = arrayListOf<Rect>()
     if (!detectROI(image, ROI, false, context)) return null
 
-    return matToBitmap(image[0]!!)
+    var processedROI = arrayListOf<Mat?>()
+    var paddingPercentages = arrayListOf<Double>()
+    cropAndResize(ROI, processedROI, paddingPercentages, image)
+
+    var landmarks = arrayListOf<ArrayList<Point>>()
+    extractFeatures(processedROI, landmarks)
+
+
+    return matToBitmap(processedROI[0]!!)
 
 }
 

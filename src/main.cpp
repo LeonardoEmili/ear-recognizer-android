@@ -10,16 +10,48 @@ void evaluate()
     vector<Mat> descriptors;
     vector<string> imageNames;
     importFeatures(descriptors, imageNames);
-    double threshold = 0.0;
-    for (int i = 0; i < 6; i++)
+    /*double threshold = 1.0;
+    for (int i = 0; i < 10; i++)
     {
         cout << "Threshold: " << threshold << "\n";
         double gar = calculateVerificationGAR(descriptors, imageNames, threshold);
         cout << "GAR: " << gar << "\n";
         double far = calculateVerificationFAR(descriptors, imageNames, threshold);
         cout << "FAR: " << far << "\n\n";
-        threshold += 0.02;
+        threshold -= 0.02;
+    }*/
+    vector<double> thresholds;
+    vector<double> GARs;
+    vector<double> FARs;
+    double threshold = 1.00;
+    while (threshold >= 0.0)
+    {
+        cout << "Threshold: " << threshold << "\n";
+        thresholds.push_back(threshold);
+        double gar = calculateVerificationGAR(descriptors, imageNames, threshold);
+        cout << "GAR: " << gar << "\n";
+        GARs.push_back(gar);
+        double far = calculateVerificationFAR(descriptors, imageNames, threshold);
+        cout << "FAR: " << far << "\n\n";
+        FARs.push_back(far);
+        threshold -= 0.01;
     }
+    cout << "Thresholds: ";
+    for (double threshold : thresholds)
+    {
+        cout << threshold << ", ";
+    }
+    cout << "\nGARs: ";
+    for (double gar : GARs)
+    {
+        cout << gar << ", ";
+    }
+    cout << "\nFARs: ";
+    for (double far : FARs)
+    {
+        cout << far << ", ";
+    }
+    cout << "\n";
 }
 
 /**

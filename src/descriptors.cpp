@@ -277,9 +277,20 @@ double calculateVerificationGAR(vector<Mat> imageDescriptors, vector<string> ima
     double attemptsNo = 0.0;
     double acceptancesNo = 0.0;
 
+    // Number of templates per identity
+    std::map<std::string, int> templatesNoPerIdentity;
+
     for (int i = 0; i < imageNames.size(); i++)
     {
         string identityPrefix = imageNames[i].substr(0, 3);
+
+        if (templatesNoPerIdentity.find(identityPrefix) == templatesNoPerIdentity.end())
+        {
+            templatesNoPerIdentity[identityPrefix] = 0;
+        }
+        templatesNoPerIdentity[identityPrefix] += 1;
+
+        bool accepted = false;
         for (int j = 0; j < imageNames.size(); j++)
         {
             // Avoiding self comparison
@@ -291,13 +302,25 @@ double calculateVerificationGAR(vector<Mat> imageDescriptors, vector<string> ima
             {
                 continue;
             }
-            attemptsNo++;
-            if (computeSimilarity(imageDescriptors[i], imageDescriptors[j]) > threshold)
+            if (1 - computeSimilarity(imageDescriptors[i], imageDescriptors[j]) <= threshold)
             {
-                acceptancesNo++;
+                accepted = true;
             }
         }
+        if (accepted)
+        {
+            acceptancesNo++;
+        }
     }
+
+    for (auto x : templatesNoPerIdentity)
+    {
+        if (x.second > 1)
+        {
+            attemptsNo += x.second;
+        }
+    }
+
     //cout << acceptancesNo << "\n";
     //cout << attemptsNo << "\n";
 
@@ -315,22 +338,32 @@ double calculateVerificationFAR(vector<Mat> imageDescriptors, vector<string> ima
 
     for (int i = 0; i < imageNames.size(); i++)
     {
+        // map for this probe: identity -> acceptance status
+        // initially it is not accepted by any identity
+        // when one identity accepts it, it turns to true
+        std::map<std::string, bool> acceptedForIdentity;
+
         string identityPrefix = imageNames[i].substr(0, 3);
         for (int j = 0; j < imageNames.size(); j++)
         {
-            // Avoiding self comparison
-            if (i == j)
-            {
-                continue;
-            }
             if (startsWith(imageNames[j], identityPrefix))
             {
                 continue;
             }
-            attemptsNo++;
-            if (computeSimilarity(imageDescriptors[i], imageDescriptors[j]) > threshold)
+            string templateIdentityPrefix = imageNames[j].substr(0, 3);
+            // Initializing map entry for this identity
+            if (acceptedForIdentity.find(templateIdentityPrefix) == acceptedForIdentity.end())
             {
-                acceptancesNo++;
+                acceptedForIdentity[templateIdentityPrefix] = false;
+                attemptsNo++;
+            }
+            if (1.0 - computeSimilarity(imageDescriptors[i], imageDescriptors[j]) <= threshold)
+            {
+                if (!acceptedForIdentity[templateIdentityPrefix])
+                {
+                    acceptedForIdentity[templateIdentityPrefix] = true;
+                    acceptancesNo++;
+                }
             }
         }
     }

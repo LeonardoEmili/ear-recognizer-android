@@ -103,7 +103,7 @@ see that previous issues are less visible:
 Since the AMI dataset contains images of left ears as well as right ears, we decided to only keep images
 of left ears to facilitate the later matching step. In particular, we manage to get the ROI by applying
 both the left and right cascade classifier on the original image and finally flip it over the vertical
-axis if the image represents a right ear. By doing so, we obtain a detection rate of 54.45\% and proceed
+axis if the image represents a right ear. By doing so, we obtain a detection rate of 48.85\% and proceed
 with the rest of the pipeline on the detected images.
 At the end of this phase, we finally have our ROI, and by cropping the green areas,
 we can ignore the rest of the image. It is worth noting that all the images are converted into

@@ -64,6 +64,7 @@ input image to detect if it contains an ear shape. If at any stage, the decision
 window is discarded without any further processing.
 
 \begin{figure}[h]
+    \label{fig:detection}
     \begin{center}
         \includegraphics[width=10cm,keepaspectratio]{images/detection.png}
         \caption{ROI after applying a degree of rotation (-10/0/+10°).}
@@ -84,6 +85,7 @@ $k$ around it. We experimentally found that for $k=80$ our model performs the be
 see that previous issues are less visible:
 
 \begin{figure}[h]
+    \label{fig:padding_detection}
     \begin{center}
         \includegraphics[width=10cm,keepaspectratio]{images/padding_detection.png}
         \caption{ROI with padding after applying a degree of rotation (-10/0/+10°).}
@@ -101,6 +103,7 @@ of interest (i.e. landmarks). We first experimented using a state-of-the-art con
 (CNN) from the work of Hansley et al. that was specifically trained on this task and it performed quite well.
 
 \begin{figure}[h]
+    \label{fig:landmark}
     \begin{center}
         \includegraphics[width=4cm,keepaspectratio]{images/landmark.jpeg}
         \caption{Landmark detection using a state-of-the-art CNN.}
@@ -123,6 +126,7 @@ shapes, the ORB algorithm plays in a different way and aims at finding generic i
 we expect the resulting set of keypoints to be different from each other.
 
 \begin{figure}[h]
+    \label{fig:landmark_orb}
     \begin{center}
         \includegraphics[width=12cm,keepaspectratio]{images/landmark_orb.png}
         \caption{Landmark detection using the ORB algorithm.}
@@ -146,6 +150,7 @@ we are filtering out points that are far from the centroid. Here, we see the eff
 where the green circles represent points that satisfy the condition while red points discarded:
 
 \begin{figure}[h]
+    \label{fig:landmark_orb_reduced}
     \begin{center}
         \includegraphics[width=14cm,keepaspectratio]{images/landmark_orb_reduced.png}
         \caption{Effects of landmarks reduction based on sparsity of data points.}
@@ -160,23 +165,90 @@ using the first model.
 
 \section{Alignment phase}
 
-Another common technique that is common when designing a biometric module is image alignment. In fact,
+Another technique that is common when designing a biometric module is image alignment. In fact,
 in the beginning, we said that we want a recognition system capable of identifying the user even if the
 input probe is not perfectly centered and aligned. In order to do that, we explored a few techniques to
-estimate the initial orientation of the image and finally opted for regression. The idea is simple, if
+estimate the initial orientation of the image and we finally opted for regression. The idea is simple, if
 we look at the ear shape, we can observe that it is stretched along one direction, and more interesting,
 key points naturally tend to follow this direction. In these terms, we got a formulation for a linear
-regression problem where the goal is to find the line that better approximates a set of points (i.e. the landmarks).
-We did it and got some unexpected results:
+regression problem where the goal is to find the line that better approximates a given set of points
+(i.e. the landmarks). We did it and got some unexpected results:
 
 \begin{figure}[h]
+    \label{fig:rotation}
     \begin{center}
-        \includegraphics[width=8cm,keepaspectratio]{images/rotation.png}
-        \caption{Ear rotation .}
+        \includegraphics[width=7cm,keepaspectratio]{images/rotation.png}\\
+        \includegraphics[width=7cm,keepaspectratio]{images/rotation2.png}
+        \caption{Ear rotation using landmarks provided by the CNN vs our landmarks.}
     \end{center}
 \end{figure}
 
-TODO: discuss about zoom with padding, difference with rotations obtained using the CNN model.
+As we can see, the idea of using linear regression for estimating the initial image orientation
+provides us a reliable way of computing the angle $\theta$ between that line and the vertical line
+that we use as a reference for our orientation system. By doing so, we are able to align all of the
+images according to the compute angle, allowing a fair comparison when later we need to match the input
+probe with gallery templates. 
+Again, we want to precise that the set of detected landmarks produced by the two algorithms
+is not the same, hence the alignment step, which is based on it, can be different choosing a
+different algorithm. However, we found it interesting to see that our idea of applying linear
+regression on the set of key points can be applied in both cases.
+It's worth noting that rotating an image by a given angle gives us a larger
+output image than the original one. In fact, with the rotation we discovered two main issues: the size
+of the output image depends on the value of $\theta$ and the areas of the output image corresponding to
+the corners need to be filled with some value in order to be matched with other images. The first issue
+tells us that when later we will match an input probe with gallery templates, their size once processed
+may be different. On the other hand, the latter happens because we consider the corners of the original
+image to be part of the rotated one, but if we look closer at Figure \ref{fig:padding_detection} we can see
+that they designate a
+portion of the detected ROI that does not necessarily contain useful information for our matching purposes.
+
+\begin{figure}[h]
+    \label{fig:rotation_issue}
+    \begin{center}
+        \includegraphics[width=12cm,keepaspectratio]{images/rotation_issue.png}
+        \caption{Issue with ear rotation and our solution using zoom on the image with padding.}
+    \end{center}
+\end{figure}
+
+In order to facilitate a fair comparison, we decided to make all processed images to the same output size,
+and for what concerns the corner value of the output image, we opted for pixel interpolation using
+neighboring values.
+However, even though interpolation seems a reasonable choice, it will introduce noise into the processed image.
+We tackle this problem using the aforementioned padding on the input image, but now we also know how much
+padding was previously added: we have a way of reducing the noise introduced by interpolation. The idea is
+represented in Figure 7. We now apply rotation on a bigger image than the original ROI, then interpolate
+values on the corners, and finally "zoom in" in the ear zone (i.e. the area within the orange bounding box)
+by applying cropping with a value of zoom that is proportional to the applied padding.
+
+\begin{figure}[h]
+    \label{fig:rotation_comparison}
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/rotation_comparison.png}
+        \caption{Interpolation on the corners without (above) and with (below) padding.}
+    \end{center}
+\end{figure}
+
+\section{Feature extraction phase}
+
+It is a vital phase since we care about representing points of interest in a feature descriptor no matter
+where these features are present in our image. In other words, we want to able to extract ear features
+even if they appear translated in the original image, then when we perform the matching between descriptors
+they should be designed in a way such that they are invariant to such geometric transformations.
+For these reasons, we have chosen to rely on the ORB algorithm for the feature extraction task too.
+In particular, we found it useful to have a compact feature vector for each detected key point but also
+because it allowed us to experiment with a few configurations of the algorithm in order to get the best
+results. We experimentally found that using $edgeThreshold=10$ in conjunction with the previous technique
+to reduce the points sparsity, allowed us to get a good set of points on the ear shape.
+Finally, we performed feature descriptor matching using the $BFMatcher$ that is essentially a brute force
+matcher that takes every descriptor in the first and matches it with all the descriptors in the second set.
+Once the matching operation is completed, we have a way of measuring distances between the set of descriptors
+of the probe image with respect to the current template in the gallery. To reject poor matches and to obtain
+a single similarity score, we relied on the ratio test proposed by Lowe et al. \cite{Lowe:2004:DIF:993451.996342}
+using a value for $ratio=0.75$, then the similarity between two sets of descriptors is the ratio between good
+matches over the total number of matches.
+
+\section{Evaluation phase}
+
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}

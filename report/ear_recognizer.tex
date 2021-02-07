@@ -4,7 +4,14 @@
 \usepackage{graphicx}
 \usepackage{babel,blindtext}
 \usepackage{float}
-
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,
+    urlcolor=black,
+    citecolor=black,
+}
 
 % Default margins are too wide all the way around. I reset them here
 \setlength{\topmargin}{-.5in}
@@ -78,8 +85,7 @@ dataset. It is clear that the best localization results are achieved when the im
 However, it is worth noting that the bounding box denoted by the detection procedure does not contain the
 whole ear and cuts off some external regions.  For the sake of completeness, we also include the results when
 a small rotation is applied to the image. We can see that the ear zone localization is still quite good even
-though the aforementioned problem is more evident.\\
-
+though the aforementioned problem is more evident.
 In order to improve the quality of the localization performed by the considered classifiers \cite{Castrillon11-caepia},
 we propose a slight modification of the original algorithm
 where the considered ROI is the bounding box returned by the algorithm plus a small area of padding of size
@@ -94,6 +100,11 @@ see that previous issues are less visible:
     \end{center}
 \end{figure}
 
+Since the AMI dataset contains images of left ears as well as right ears, we decided to only keep images
+of left ears to facilitate the later matching step. In particular, we manage to get the ROI by applying
+both the left and right cascade classifier on the original image and finally flip it over the vertical
+axis if the image represents a right ear. By doing so, we obtain a detection rate of 54.45\% and proceed
+with the rest of the pipeline on the detected images.
 At the end of this phase, we finally have our ROI, and by cropping the green areas,
 we can ignore the rest of the image. It is worth noting that all the images are converted into
 grayscale images and resized into a fixed size for the next steps.
@@ -204,7 +215,7 @@ image to be part of the rotated one, but if we look closer at Figure \ref{fig:pa
 that they designate a
 portion of the detected ROI that does not necessarily contain useful information for our matching purposes.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \label{fig:rotation_issue}
     \begin{center}
         \includegraphics[width=12cm,keepaspectratio]{images/rotation_issue.png}
@@ -283,6 +294,61 @@ matches over the total number of matches.
 
 \blindtext
 
+\section{Android porting}
+
+In this work, we implemented the recognition pipeline as a standalone C++ program that was used for
+testing the performances of the module on the AMI dataset. We also developed an Android application
+to allow the enrollment of new subjects, verification, and identification of already registered ones.
+Both the projects heavily rely on the OpenCV library \cite{opencv_library} and have been tested using
+version 4.5.1. on both the systems to avoid compatibility issues. The Android project essentially consists
+of a porting in the Kotlin language of some of the functionalities available in the desktop application.
+The user interface is pretty simple and allows user enrollment via ear image acquisition through the phone
+camera. Once acquired, it is passed through our biometric module and processed according to the described pipeline:
+the first step is ROI detection using Haar Feature-based Cascade Classifiers, then cropping and resizing with
+padding is applied over the obtained area, landmark detection is performed to allow automatic image orientation
+along the vertical axis, and finally, the image is rotated according to the computed angle and zoomed in using
+the idea which was previously described.
+Furthermore, the app allows performing either verification or identification using their dedicated sections.
+For the verification task, the user simply declares his claimed identity and selects an image either from the phone
+gallery or by taking a photo and submits it to the system. The system will return a decision that is accepted if the
+similarity score of the probe image with any of the user templates in the gallery is above the acceptance threshold
+or rejected otherwise. On the other hand, the identification tasks will look for matches with any template in the
+gallery, check if any template in the gallery generates an alarm for the given input probe, and finally return
+the identity associated to the template with the highest similarity score if it is above the considered acceptance
+threshold as well as the similarity score.
+Moreover, for what concerns the gallery organization we decided to leverage the Android filesystem scheme and
+store each template as an individual file named with the id of the corresponding identity. This simple organizational
+scheme allows templates to be quickly retrieved whenever necessary and improves project modularity. All the files that
+are required for the application to work are shipped with it as bundle files and can be retrieved by using
+Android File System API. 
+
+\section{External resources}
+
+In this section we list all the external resources that we used at any step of the pipeline and that are not
+built-in in C++/Android or shipped with the base version of the OpenCV library. Their credits are available in
+the References section. All of the remaining code or considerations are part of this work and have been
+developed during it.
+
+\begin{itemize}
+    \item Left and right ear Haar feature-based cascade classifiers from
+        the
+        \href{https://github.com/DiUS/Physiognomy/tree/master/python/haarcascades}{\emph{official GitHub OpenCV repository}}
+        or from
+        \href{https://github.com/DiUS/Physiognomy/tree/master/python/haarcascades}{\emph{this repository}}.
+    \item First stage landmark detector using a CNN from
+        \href{https://github.com/maups/ear-recognition}{\emph{this repository}}.
+\end{itemize}
+
+\section{Future work}
+
+This project started with the idea of integrating a distributed database into the Android application to let
+enrolled users test verification and identification by submitting their probes with any Android device. Due to
+the lack of time, we decided to focus more on the details of the design and implementation of the recognition
+process and opted to store locally the gallery in the user's phone. An interesting possibility for this project
+would be to integrate such distributed database, for instance using Google Cloud Firestore, to store user templates.
+Moreover, we explored multiple approaches for implementing a proper recognition pipeline and a possibility would be
+to apply more advanced techniques for landmark detection and feature extraction, for instance training a dedicated
+CNN that would probably boost the recognition performances as we saw for the landmark detection phase.
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}

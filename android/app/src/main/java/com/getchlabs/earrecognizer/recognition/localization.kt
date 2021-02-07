@@ -51,9 +51,9 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
             println("Could not open or find the image")
         }
 
-        var grayImage = Mat()
-        cvtColor(image[0], grayImage, COLOR_BGR2GRAY);
-        image[0] = grayImage
+        var grayImage = arrayListOf(Mat())
+        cvtColor(image[0], grayImage[0], COLOR_BGR2GRAY);
+        image[0] = grayImage[0]
 
     val outputSize = 96
 
@@ -61,11 +61,14 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
         if (_detectROI(grayImage, leftCascade, ROI, false, outputSize)) {
             detected = true
             if (debugFlag) println("Left ear found !")
+            return detected
         }
         // Checking right ear
         if (_detectROI(grayImage, rightCascade, ROI, true, outputSize)) {
             detected = true
             if (debugFlag) println("Right ear found !")
+            return detected
+
         }
 
         // Horizontally flip the image and interpret it as the opposite ear
@@ -78,6 +81,8 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
         if (_detectROI(grayImage, leftCascade, ROI, false, outputSize)) {
             detected = true
             if (debugFlag) println("Left (flipped) ear found !")
+            return detected
+
 
         }
 
@@ -85,6 +90,8 @@ fun detectROI(image: ArrayList<Mat?>, ROI: ArrayList<Rect>, debugFlag: Boolean, 
         if (_detectROI(grayImage, rightCascade, ROI, true, outputSize)) {
             detected = true
                 if (debugFlag) println("Right (flipped) ear found !")
+            return detected
+
         }
 
     return detected
@@ -104,21 +111,21 @@ fun isValidROI(BBox: Rect, originalFrame: Mat): Boolean {
             BBox.y + BBox.height <= originalFrame.rows())
 }
 
-fun _detectROI(frameGray: Mat, cascade: CascadeClassifier?,
+fun _detectROI(frameGray: ArrayList<Mat>, cascade: CascadeClassifier?,
 ROI: ArrayList<Rect>, rightClassifier: Boolean, outputSize: Int): Boolean {
-    var resultImage = frameGray
+    var resultImage = frameGray[0]
 
     var ears = MatOfRect()
 
 
-    cascade!!.detectMultiScale(frameGray, ears);
+    cascade!!.detectMultiScale(frameGray[0], ears);
 
 
     var earss = arrayListOf<Rect>()
 
 
     ears.toList().forEach {
-        if (isValidROI(it, frameGray) &&
+        if (isValidROI(it, frameGray[0]) &&
             arrayListOf(it.width, it.height).min()!! >= outputSize) {
             earss.add(it)
         }
@@ -126,7 +133,7 @@ ROI: ArrayList<Rect>, rightClassifier: Boolean, outputSize: Int): Boolean {
 
     // Interpret right ears as left ears for the recognition process
     if (rightClassifier) {
-        flip(resultImage, frameGray, 1);
+        flip(resultImage, frameGray[0], 1);
     }
 
     if (earss.size > 0) {

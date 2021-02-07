@@ -1,9 +1,6 @@
 package com.getchlabs.earrecognizer.recognition
 
-import org.opencv.core.KeyPoint
-import org.opencv.core.Mat
-import org.opencv.core.MatOfKeyPoint
-import org.opencv.core.Point
+import org.opencv.core.*
 import org.opencv.features2d.ORB.create
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -118,56 +115,52 @@ fun reduceDataSparsity(points: ArrayList<Point>, outPoints: ArrayList<Point>,
     }
 }
 
-fun extractFeatures(images: ArrayList<Mat?>,
-                    landmarks: ArrayList<ArrayList<Point>>)
+fun extractFeatures(images: ArrayList<ArrayList<Mat?>>,
+                    landmarks: ArrayList<ArrayList<ArrayList<Point>>>)
 {
     var keypoints = arrayListOf<MatOfKeyPoint>()
     var _t = arrayListOf<Mat?>()
-    extractFeatures(images, keypoints, _t);
+    extractFeatures(images[0], keypoints, _t);
 
     // Translate KeyPoint -> Point2d
     for ( image in keypoints)
     {
         var imgLdmks = arrayListOf<ArrayList<Point>>()
 
+
+
+        for (kpts in 0.until(image.rows())) {
             var ldmks = arrayListOf<Point>()
-            for ( k in kpts)
-            {
-                ldmks.push_back(Point2d((double) k . pt . x, (double) k . pt . y));
+            for (k in 0.until(image.cols())) {
+                ldmks.add(Point(image.get(kpts,k)[0], image.get(kpts,k)[1]))
             }
-
-        landmarks.add(ldmks);
+            imgLdmks.add(ldmks)
+        }
+        landmarks.add(imgLdmks);
     }
 
-    vector<vector<vector<Point2d>>> outLandmarks;
-    for (auto image : landmarks)
+    var outLandmarks = arrayListOf<ArrayList<ArrayList<Point>>>()
+    for ( image in landmarks)
     {
-        vector<vector<Point2d>> outLdmks;
-        for (auto ldmk : image)
+        var outLdmks = arrayListOf<ArrayList<Point>>()
+        for (ldmk in image)
         {
-            vector<Point2d> outLdmk;
+            var outLdmk = arrayListOf<Point>()
             reduceDataSparsity(ldmk, outLdmk, 3);
-            outLdmks.push_back(outLdmk);
+            outLdmks.add(outLdmk)
         }
-        outLandmarks.push_back(outLdmks);
+        outLandmarks.add(outLdmks)
     }
 
-    for (int i = 0; i < images.size(); i++)
-    {
-        auto image = images [i];
-        auto imageName = imageNames [i];
-        for (int j = 0; j < image.size(); j++)
+
+        var image = images[0]
+        for (j in 0.until(image.size))
         {
-            Mat outImage;
-            drawLandmarks(image[j], landmarks[i][j], outImage);
-            drawLandmarks(outImage, outLandmarks[i][j], outImage,
-                    Scalar(0, 255, 0), 5);
-            landmarks[i][j] = outLandmarks[i][j];
-            // Exporting landmark image
-            String id = to_string(i) + "_" + to_string(j);
-            writeToFile(imageName, LANDMARK_PATH, outImage, id);
+            var outImage = Mat()
+
+            landmarks[0][j] = outLandmarks[0][j];
         }
-    }
+
 }
 
 
@@ -180,7 +173,7 @@ fun extractFeatures(images: ArrayList<Mat?>,
 fun extractFeatures(images: ArrayList<Mat?>,
                     keypoints: ArrayList<MatOfKeyPoint>,
                     descriptors: ArrayList<Mat?>, edgeThreshold: Int = 10,
- mask: Mat = Mat())
+                    mask: Mat = Mat())
 {
     var detector = create(500, 1.2f, 8, edgeThreshold);
 

@@ -2,15 +2,18 @@
 
 #include "utility.hpp"
 
-void initializeCascade(CascadeClassifier &cascade, String name) {
-    if (!cascade.load(name)) {
+void initializeCascade(CascadeClassifier &cascade, String name)
+{
+    if (!cascade.load(name))
+    {
         cout << "--(!)Error loading " << name << " cascade classifier.\n";
         exit(1);
     };
 }
 
 void detectROI(char *datasetPath, vector<string> imageNames,
-               vector<Mat> &images, vector<vector<Rect>> &ROI, bool debugFlag) {
+               vector<Mat> &images, vector<vector<Rect>> &ROI, bool debugFlag)
+{
     // Suppress findFile annoying reminder
     freopen("/dev/null", "w", stderr);
     String leftEarCascadeName = findFile("haarcascade_mcs_leftear.xml");
@@ -26,16 +29,18 @@ void detectROI(char *datasetPath, vector<string> imageNames,
     double detectedNo = 0.0;
     double visitedNo = 0.0;
 
-    for (int i = 0; i < imageNames.size(); i++) {
+    for (int i = 0; i < imageNames.size(); i++)
+    {
         String imageName = imageNames[i];
         printProgress(i, imageNames.size());
 
         ostringstream imgPath;
         imgPath << datasetPath << imageName;
 
-        Mat image = imread(imgPath.str(), IMREAD_COLOR);  // Read the file
+        Mat image = imread(imgPath.str(), IMREAD_COLOR); // Read the file
 
-        if (image.empty()) {  // Check for invalid input
+        if (image.empty())
+        { // Check for invalid input
             cerr << "Could not open or find the image" << std::endl;
             continue;
         }
@@ -45,15 +50,21 @@ void detectROI(char *datasetPath, vector<string> imageNames,
         images.push_back(grayImage);
 
         // Checking left ear
-        if (_detectROI(grayImage, leftCascade, ROI, false, imageName)) {
+        if (_detectROI(grayImage, leftCascade, ROI, false, imageName))
+        {
             detectedNo++;
-            if (debugFlag) cout << "Left ear found !\n" << endl;
+            if (debugFlag)
+                cout << "Left ear found !\n"
+                     << endl;
             continue;
         }
         // Checking right ear
-        if (_detectROI(grayImage, rightCascade, ROI, true, imageName)) {
+        if (_detectROI(grayImage, rightCascade, ROI, true, imageName))
+        {
             detectedNo++;
-            if (debugFlag) cout << "Right ear found !\n" << endl;
+            if (debugFlag)
+                cout << "Right ear found !\n"
+                     << endl;
             continue;
         }
 
@@ -64,24 +75,31 @@ void detectROI(char *datasetPath, vector<string> imageNames,
         images[images.size() - 1] = grayImage;
 
         // Checking left (flipped) ear
-        if (_detectROI(grayImage, leftCascade, ROI, false, imageName)) {
+        if (_detectROI(grayImage, leftCascade, ROI, false, imageName))
+        {
             detectedNo++;
             if (debugFlag)
-                cout << "Left (flipped) ear found !\n" << endl << flush;
+                cout << "Left (flipped) ear found !\n"
+                     << endl
+                     << flush;
             continue;
         }
 
         // Checking right (flipped) ear
-        if (_detectROI(grayImage, rightCascade, ROI, true, imageName)) {
+        if (_detectROI(grayImage, rightCascade, ROI, true, imageName))
+        {
             detectedNo++;
             if (debugFlag)
-                cout << "Right (flipped) ear found !\n" << endl << flush;
+                cout << "Right (flipped) ear found !\n"
+                     << endl
+                     << flush;
             continue;
         }
         ROI.push_back({});
     }
 
-    cout << "Detection rate " << (float)detectedNo / (float)visitedNo << endl << flush;
+    cout << "Detection rate " << (float)detectedNo / (float)visitedNo << endl
+         << flush;
     return;
 }
 
@@ -91,16 +109,18 @@ void detectROI(char *datasetPath, vector<string> imageNames,
  * @param originalFrame the original image
  * @return whether the provided BBox is a valid area in the original image.
  */
-bool isValidROI(Rect BBox, Mat originalFrame) {
+bool isValidROI(Rect BBox, Mat originalFrame)
+{
     return (BBox.x >= 0 && BBox.y >= 0 && BBox.width >= 0 && BBox.height >= 0 &&
             BBox.x + BBox.width <= originalFrame.cols &&
             BBox.y + BBox.height <= originalFrame.rows);
 }
 
 bool _detectROI(Mat &frameGray, CascadeClassifier &cascade,
-               vector<vector<Rect>> &ROI, bool rightClassifier,
-               String imageName, const int outputSize) {
-    bool display = false;  // debug flag
+                vector<vector<Rect>> &ROI, bool rightClassifier,
+                String imageName, const int outputSize)
+{
+    bool display = false; // debug flag
     Mat resultImage = frameGray, resized;
 
     vector<Rect> ears;
@@ -115,16 +135,18 @@ bool _detectROI(Mat &frameGray, CascadeClassifier &cascade,
                ears.end());
 
     // Interpret right ears as left ears for the recognition process
-    if (rightClassifier) {
+    if (rightClassifier)
+    {
         flip(resultImage, frameGray, 1);
     }
 
-    if (ears.size() > 0) {
+    if (ears.size() > 0)
+    {
         ROI.push_back(ears);
     }
-    if (display) {
+    if (display)
+    {
         displayImage(frameGray, imageName);
     }
     return ears.size() > 0;
 }
-

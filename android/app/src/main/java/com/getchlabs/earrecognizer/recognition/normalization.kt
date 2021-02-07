@@ -1,9 +1,11 @@
 package com.getchlabs.earrecognizer.recognition
 
-import org.opencv.core.Mat
-import org.opencv.core.Rect
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc.resize
+import org.opencv.core.*
+import org.opencv.core.Core.BORDER_REPLICATE
+import org.opencv.core.CvType.CV_16F
+import org.opencv.core.CvType.CV_8UC1
+import org.opencv.imgproc.Imgproc.*
+import java.lang.Math.atan2
 
 fun cropAndResize(ROI: ArrayList<Rect>,  outputImages: ArrayList<Mat?>,
 paddingPercentages: ArrayList<Double>, grayImages: ArrayList<Mat?> )
@@ -43,6 +45,85 @@ paddingPercentages: ArrayList<Double>, grayImages: ArrayList<Mat?> )
 
         outputImages.add(resized)
     }
+}
+
+
+fun alignImages(processedROI: ArrayList<ArrayList<Mat?>>,
+                paddingPercentages: ArrayList<ArrayList<Double>>,
+                landmarks: ArrayList<ArrayList<ArrayList<Point>>>)
+{
+
+
+        var images = processedROI[0]
+        var ldmks = landmarks[0]
+        var paddingPercs = paddingPercentages[0];
+        for (j in 0.until(images.size))
+        {
+            var image = images[j]
+            var ldmk = ldmks[j]
+            var paddingPercentage = paddingPercs[j]
+
+            alignImage(image, paddingPercentage, ldmk)
+        }
+
+}
+
+fun alignImage(image: Mat?, paddingPercentage: Double,  landmarks: ArrayList<Point>,
+               outputSize: Int = 96)
+{
+    image!!
+    // Fitting line among landmark points
+    var line = Mat()
+    var landmarkss = Mat.zeros(landmarks.size, 2, CV_8UC1 )
+    for (i in 0.until(landmarks.size)) {
+        landmarkss.put(i,0, landmarks[i].x)
+        landmarkss.put(i,1, landmarks[i].y)
+    }
+    fitLine(landmarkss, line, DIST_L2, 0.0, 0.01, 0.01);
+    var radians = atan2(line.get(1,0)[0], line.get(0,0)[0])
+    // vector -> radians = atan2(vy,vx)
+    // Ears tilted counter clockwise wrt vertical line -> vector of type (y
+    // = 0.381557, x = 0.924345), radians angle of type 1.1793 (starting
+    // from left and going clockwise) Ears tilted clockwise wrt vertical
+    // line -> vector of type (y = 0.148791, x = -0.988869), radians angle
+    // of type -1.4214 (starting from left and going clockwise)
+    var angle = (if (radians >= 0)  -1 else 1) * 90.0 +
+    radians * (180.0 / 3.141592653589793238463);
+
+    // get rotation matrix for rotating the image around its center in pixel
+    // coordinates
+    var center = Point((image.cols() - 1) / 2.0, (image.rows() - 1) / 2.0)
+    var rot = getRotationMatrix2D(center, angle, 1.0);
+    // determine bounding rectangle, center not relevant
+    var bbox = RotatedRect(Point(), image.size(), angle).boundingRect();
+    // adjust transformation matrix
+    rot.put(0, 2, rot.get(0,2)[0] + (bbox.width / 2.0 - image.cols() / 2.0));
+    rot.put(1, 2, rot.get(1,2)[0] + (bbox.height / 2.0 - image.rows() / 2.0));
+
+
+
+    // Rotating ear image with interpolation
+    var rotated = Mat()
+    warpAffine(image, rotated, rot, bbox.size(), INTER_LANCZOS4,
+            BORDER_REPLICATE);
+
+    // Zooming using padding
+    //
+    var croppedEar = Mat()
+    rotated.copyTo(croppedEar)
+    var cropped = Rect()
+    var allowanceFactor = 1.2
+    var padding: Int = (paddingPercentage * rotated.cols() / allowanceFactor).toInt()
+    cropped.x = padding;
+    cropped.y = padding;
+    cropped.width = rotated.cols() - 2 * padding;
+    cropped.height = rotated.rows() - 2 * padding;
+    croppedEar = croppedEar.adjustROI(cropped.y, croppedEar.rows()-cropped.y+cropped.height,
+            cropped.x, croppedEar.cols()-cropped.x+cropped.width)
+
+    // Resizing rotated image
+    resize(croppedEar, image, Size(outputSize.toDouble(), outputSize.toDouble()));
+
 }
 
 /*

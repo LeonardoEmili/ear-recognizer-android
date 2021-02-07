@@ -23,11 +23,16 @@ fun recognize(bmp: Bitmap, context: Context): Bitmap? {
     var paddingPercentages = arrayListOf<Double>()
     cropAndResize(ROI, processedROI, paddingPercentages, image)
 
-    var landmarks = arrayListOf<ArrayList<Point>>()
-    extractFeatures(processedROI, landmarks)
+    var landmarks = arrayListOf<ArrayList<ArrayList<Point>>>()
+    var processedROI2 = arrayListOf(processedROI)
+    extractFeatures(processedROI2, landmarks)
+
+    var paddingPercentages2 = arrayListOf(paddingPercentages)
+    alignImages(processedROI2, paddingPercentages2, landmarks);
 
 
-    return matToBitmap(processedROI[0]!!)
+
+    return matToBitmap(processedROI2[0][0]!!)
 
 }
 

@@ -36,9 +36,11 @@ paddingPercentages: ArrayList<Double>, grayImages: ArrayList<Mat?> )
         paddingPercentages.add(paddingPercentage)
 
             // TODO: check this function call
-            croppedEar = croppedEar.adjustROI(ear.y, croppedEar.rows()-ear.y+ear.height,
-                    ear.x, croppedEar.cols()-ear.x+ear.width)
-            var outputImg: Mat = croppedEar
+            //croppedEar = croppedEar.adjustROI(ear.y, croppedEar.rows()-(ear.y+ear.height),
+              //      ear.x, croppedEar.cols()-(ear.x+ear.width))
+        croppedEar =  Mat(croppedEar, ear)
+
+        var outputImg: Mat = croppedEar
 
             resize(outputImg, resized, Size(outputSize.toDouble(), outputSize.toDouble()));
 
@@ -80,19 +82,21 @@ fun alignImage(image: Mat?, paddingPercentage: Double,  landmarks: ArrayList<Poi
         landmarkss.put(i,1, landmarks[i].y)
     }
     fitLine(landmarkss, line, DIST_L2, 0.0, 0.01, 0.01);
-    var radians = atan2(line.get(1,0)[0], line.get(0,0)[0])
+    var radians= kotlin.math.atan2(line.get(1,0)[0], line.get(0,0)[0])
+
     // vector -> radians = atan2(vy,vx)
     // Ears tilted counter clockwise wrt vertical line -> vector of type (y
     // = 0.381557, x = 0.924345), radians angle of type 1.1793 (starting
     // from left and going clockwise) Ears tilted clockwise wrt vertical
     // line -> vector of type (y = 0.148791, x = -0.988869), radians angle
     // of type -1.4214 (starting from left and going clockwise)
-    var angle = (if (radians >= 0)  -1 else 1) * 90.0 +
-    radians * (180.0 / 3.141592653589793238463);
+    var angle = (if (radians >= 0)  -1.0 else 1.0) * 90.0 +
+    radians * (180.0 / 3.141592653589793238463)
+
 
     // get rotation matrix for rotating the image around its center in pixel
     // coordinates
-    var center = Point((image.cols() - 1) / 2.0, (image.rows() - 1) / 2.0)
+    var center = Point((image.cols() - 1.0) / 2.0, (image.rows() - 1.0) / 2.0)
     var rot = getRotationMatrix2D(center, angle, 1.0);
     // determine bounding rectangle, center not relevant
     var bbox = RotatedRect(Point(), image.size(), angle).boundingRect();
@@ -118,8 +122,10 @@ fun alignImage(image: Mat?, paddingPercentage: Double,  landmarks: ArrayList<Poi
     cropped.y = padding;
     cropped.width = rotated.cols() - 2 * padding;
     cropped.height = rotated.rows() - 2 * padding;
-    croppedEar = croppedEar.adjustROI(cropped.y, croppedEar.rows()-cropped.y+cropped.height,
-            cropped.x, croppedEar.cols()-cropped.x+cropped.width)
+    //croppedEar = croppedEar.adjustROI(cropped.y, croppedEar.rows()-(cropped.y+cropped.height),
+      //      cropped.x, croppedEar.cols()-(cropped.x+cropped.width))
+    croppedEar =  Mat(croppedEar, cropped)
+
 
     // Resizing rotated image
     resize(croppedEar, image, Size(outputSize.toDouble(), outputSize.toDouble()));

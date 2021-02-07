@@ -129,11 +129,12 @@ fun extractFeatures(images: ArrayList<ArrayList<Mat?>>,
 
 
 
-        for (kpts in 0.until(image.rows())) {
+        for (kpts in 0.until(image.cols())) {
             var ldmks = arrayListOf<Point>()
-            for (k in 0.until(image.cols())) {
-                ldmks.add(Point(image.get(kpts,k)[0], image.get(kpts,k)[1]))
+            for (k in 0.until(image.rows())) {
+                ldmks.add(Point(image.get(k,kpts)[0], image.get(k,kpts)[1]))
             }
+
             imgLdmks.add(ldmks)
         }
         landmarks.add(imgLdmks);

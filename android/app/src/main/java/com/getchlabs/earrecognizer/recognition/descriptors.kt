@@ -167,6 +167,19 @@ fun extractFeatures(images: ArrayList<ArrayList<Mat?>>,
 
 
 
+fun extractFeatures(images: ArrayList<ArrayList<Mat?>>, descriptors: ArrayList<Mat?>,
+                     edgeThreshold: Int = 10,
+                    mask: Mat = Mat())
+{
+    var keypoints = arrayListOf<MatOfKeyPoint>()
+    var tmpDescriptors = ArrayList<Mat?>()
+    extractFeatures(images[0], keypoints, tmpDescriptors);
+
+    descriptors.clear();
+
+    tmpDescriptors.forEach { descriptors.add(it) }
+
+}
 
 
 

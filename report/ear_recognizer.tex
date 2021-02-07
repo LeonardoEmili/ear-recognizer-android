@@ -3,6 +3,8 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{babel,blindtext}
+\usepackage{float}
+
 
 % Default margins are too wide all the way around. I reset them here
 \setlength{\topmargin}{-.5in}
@@ -248,6 +250,38 @@ using a value for $ratio=0.75$, then the similarity between two sets of descript
 matches over the total number of matches.
 
 \section{Evaluation phase}
+
+\blindtext
+
+\begin{figure}[H]
+    \label{fig:roc}
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/roc.png}
+        \caption{Interpolation on the corners without (above) and with (below) padding.}
+    \end{center}
+\end{figure}
+
+\blindtext
+
+\begin{figure}[H]
+    \label{fig:det}
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/det.png}
+        \caption{Interpolation on the corners without (above) and with (below) padding.}
+    \end{center}
+\end{figure}
+
+\blindtext
+
+\begin{figure}[H]
+    \label{fig:eer}
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/eer.png}
+        \caption{Interpolation on the corners without (above) and with (below) padding.}
+    \end{center}
+\end{figure}
+
+\blindtext
 
 
 \bibliographystyle{ieeetr}

@@ -1,19 +1,184 @@
 \documentclass{article}
+
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{babel,blindtext}
+
 % Default margins are too wide all the way around. I reset them here
 \setlength{\topmargin}{-.5in}
 \setlength{\textheight}{9in}
 \setlength{\oddsidemargin}{.125in}
 \setlength{\textwidth}{6.25in}
+
 \begin{document}
-\title{Ear Recognizer}
+
+\title{Ear Recognizer Android}
 \author{Leonardo Emili, Alessio Luciani\\
 Sapienza University of Rome}
 \renewcommand{\today}{February, 2021}
 \maketitle
-Ear recognition system developed using \emph{OpenCV} and \emph{Android}.
 
-\section {Introduction}
+\section{Introduction}
 
-...
+The ear as a new biometrics has recently gained a discrete success because of some fundamental properties it has,
+among them: uniqueness, permanence, collectability, and universality.
+We owe A. Iannarelli for these incredibile findings, in 1989 he discovered that no pair of individuals
+share the same ear shape, therefore it is possible to use them to identify people. Although humans are
+not used to recognizing people by their ear shape, it is possible to leverage a number of keypoints
+(namely points of interest) in the ear shape in order to distinguish them. Moreover, ears present
+less details with respect to other biometrics (e.g. the face), hence allowing them be captured by
+means of lower resolution devices. However, some challenges must be tackled when dealing with ear
+recognition: the size and the fact that they share the same colour of the skin puts some difficulties,
+as well as their position that may be an obstacle because they may be only partially visible.
+In the years, researchers proposed several approaches to deal with the ear recognition task, in some
+cases requiring the use of complex neural networks as well as a large collection of annotated data
+to train them. In this work, we implemented a recognition system according to the best pratices that
+are adopted when designing a biometric module, exploring different techniques that are currently employed
+by state-of-the-art solutions.
+
+\section{Dataset}
+
+We conducted our experiments using the Mathematical Analysis of Images (AMI) Ear Database \cite{ami}: it consists
+of a collection of 700 2D images acquired from 100 different subjects in an indoor environment.
+Images show a high degree of variability since they represent ears of subjects in the range of 19-65 ears
+taken from multiple points of view. Since all of the images come shipped with the identifier of the subject
+they belong to, we have been able to evaluate our work against it and draw some considerations
+about the final performances.
+
+\section{Localization phase}
+
+The first step of the pipeline aims at designing a detection module for detecting whether the provided image
+contains ear shapes or not and for localizing their position within the image. The idea is that we only care
+about portions of the original image containing ears while discarding other irrelevant information.
+From now on, we will refer to these portions with the term of Region of Interest (ROI), denoting the bounding
+box surrounding the ear zone. Our goal is to build a detection module that is robust enough to rotations,
+translations, viewpoint, and scale changes. The reason is that images may not be perfect and the ear region
+not perfectly centered, but we want to be able to extract valid ROI no matter their position in the original
+image. To this aim, we relied on Viola-Jones Haar Feature-based Cascade Classifiers \cite{conf/cvpr/ViolaJ01}
+to detect valid ROI.
+The algorithm works by combining the power of Haar-like features to useful extract information from the
+image (e.g. presence of edges or straight lines) with the concept of integral images to speed up computations.
+The AdaBoost algorithm is responsible for the training procedure which selects a subset of meaningful features
+from the original set of features. Finally, a sequence of gradually stronger classifiers is applied over the
+input image to detect if it contains an ear shape. If at any stage, the decision is negative then the considered
+window is discarded without any further processing.
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/detection.png}
+        \caption{ROI after applying a degree of rotation (-10/0/+10°).}
+    \end{center}
+\end{figure}
+
+In the above figure, it is possible to see the effects of applying ear detection on a real image from the
+dataset. It is clear that the best localization results are achieved when the image is not rotated at all.
+However, it is worth noting that the bounding box denoted by the detection procedure does not contain the
+whole ear and cuts off some external regions.  For the sake of completeness, we also include the results when
+a small rotation is applied to the image. We can see that the ear zone localization is still quite good even
+though the aforementioned problem is more evident.\\
+
+In order to improve the quality of the localization performed by the considered classifiers \cite{Castrillon11-caepia},
+we propose a slight modification of the original algorithm
+where the considered ROI is the bounding box returned by the algorithm plus a small area of padding of size
+$k$ around it. We experimentally found that for $k=80$ our model performs the best and below here we can
+see that previous issues are less visible:
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=10cm,keepaspectratio]{images/padding_detection.png}
+        \caption{ROI with padding after applying a degree of rotation (-10/0/+10°).}
+    \end{center}
+\end{figure}
+
+At the end of this phase, we finally have our ROI, and by cropping the green areas,
+we can ignore the rest of the image. It is worth noting that all the images are converted into
+grayscale images and resized into a fixed size for the next steps.
+
+\section{Landmark detection phase}
+
+In this phase, we explored some of the most common approaches when extracting points
+of interest (i.e. landmarks). We first experimented using a state-of-the-art convolutional neural network
+(CNN) from the work of Hansley et al. that was specifically trained on this task and it performed quite well.
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=4cm,keepaspectratio]{images/landmark.jpeg}
+        \caption{Landmark detection using a state-of-the-art CNN.}
+    \end{center}
+\end{figure}
+
+However, for the aim of this project, we thought that it would be interesting to test ourselves
+by experimenting with some specific algorithm instead of using an off-the-shelf model. In this context,
+we analyze the effects of applying the Oriented FAST and rotated BRIEF (ORB) algorithm \cite{conf/iccv/RubleeRKB11}
+for detecting
+image keypoints and extracting features. The algorithm essentially works by combining the feature detection
+provided by the FAST algorithm \cite{rosten_2006_machine}, which performs corner detection by inspecting if a pixel
+has a contiguous
+set of pixels that are brighter or darker than a threshold, and the BRIEF algorithm \cite{Calonder:2010:BBR:1888089.1888148}
+for feature description
+computation, which allows us to get a compact feature vector. It's important to say that the two
+algorithms are used in this context for the same purpose (i.e. landmark detection), but their task is
+slightly different: while the CNN was specifically trained for detecting landmarks that are specific to ear
+shapes, the ORB algorithm plays in a different way and aims at finding generic image keypoints. Thus,
+we expect the resulting set of keypoints to be different from each other.
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=12cm,keepaspectratio]{images/landmark_orb.png}
+        \caption{Landmark detection using the ORB algorithm.}
+    \end{center}
+\end{figure}
+
+We can see how the set of landmarks produced by the ORB algorithm is much more widespread around the
+center of the ear and does not necessarily follow the ear shape. However, we thought we could improve the
+results achieved using ORB by doing some considerations about the distribution of our data. We know that the ear
+region contains many meaningful key points that will later be used when matching incoming probes with templates
+belonging to enrolled subjects. If we inspect how these points are distributed we can clearly distinguish some
+outliers (e.g. in the hair region) from the rest of the points that are concentrated around the center of the ear.
+Hence, we decided to apply data reduction to our set of landmarks $X$ and only to retain those points that
+satisfy the following condition:
+
+$$ d(x_i, \mu_X) <= l * \sigma_X $$
+
+where $d(x_i,x_j)$ is the Euclidean distance bewteen $x_i$ and $x_j$, $\mu_X$ and $\sigma_X$ are respectively the
+centroid and the standard deviation of our set of points, and $l$ can be seen as a factor that controls how strictly
+we are filtering out points that are far from the centroid. Here, we see the effects for different values of $l$,
+where the green circles represent points that satisfy the condition while red points discarded:
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=14cm,keepaspectratio]{images/landmark_orb_reduced.png}
+        \caption{Effects of landmarks reduction based on sparsity of data points.}
+    \end{center}
+\end{figure}
+
+We can observe that when $l$ is low many important landmarks are discarded, on the other hand,
+if we choose a suitable value for $l$ we can have a better approximation of the landmarks that were previously
+obtained using a dedicated CNN. We find it particularly interesting because the latter results can be computed
+much faster, and above all, we can skip the complex training and data preparation which is instead required if
+using the first model.
+
+\section{Alignment phase}
+
+Another common technique that is common when designing a biometric module is image alignment. In fact,
+in the beginning, we said that we want a recognition system capable of identifying the user even if the
+input probe is not perfectly centered and aligned. In order to do that, we explored a few techniques to
+estimate the initial orientation of the image and finally opted for regression. The idea is simple, if
+we look at the ear shape, we can observe that it is stretched along one direction, and more interesting,
+key points naturally tend to follow this direction. In these terms, we got a formulation for a linear
+regression problem where the goal is to find the line that better approximates a set of points (i.e. the landmarks).
+We did it and got some unexpected results:
+
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=8cm,keepaspectratio]{images/rotation.png}
+        \caption{Ear rotation .}
+    \end{center}
+\end{figure}
+
+TODO: discuss about zoom with padding, difference with rotations obtained using the CNN model.
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
 
 \end{document}

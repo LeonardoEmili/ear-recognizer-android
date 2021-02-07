@@ -98,6 +98,21 @@ void alignImage(Mat &image, double paddingPercentage, vector<Point2d> landmarks,
     rot.at<double>(0, 2) += bbox.width / 2.0 - image.cols / 2.0;
     rot.at<double>(1, 2) += bbox.height / 2.0 - image.rows / 2.0;
 
+    /* Uncomment to print fit line.
+    Mat3b grayBGR;
+    cvtColor(image, grayBGR, COLOR_GRAY2BGR);
+
+    for (Point2d landmark : landmarks)
+    {
+        circle(grayBGR, landmark, 5, Scalar(0, 0, 255), FILLED);
+    }
+
+    cv::line(grayBGR, Point2d(line[2] - line[0] * 90, line[3] - line[1] * 90),
+             Point2d(line[2] + line[0] * 90, line[3] + line[1] * 90), Scalar(0, 255, 0),
+             5, LINE_8);
+    writeToFile(imageName, CROPPED_PATH, grayBGR, id);
+    */
+
     // Rotating ear image with interpolation
     Mat rotated;
     warpAffine(image, rotated, rot, bbox.size(), INTER_LANCZOS4,

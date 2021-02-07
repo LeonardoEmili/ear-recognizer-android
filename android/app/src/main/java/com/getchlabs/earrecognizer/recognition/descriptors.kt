@@ -1,6 +1,9 @@
 package com.getchlabs.earrecognizer.recognition
 
 import org.opencv.core.*
+import org.opencv.core.Core.NORM_HAMMING
+import org.opencv.features2d.BFMatcher
+import org.opencv.features2d.DescriptorMatcher
 import org.opencv.features2d.ORB.create
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -208,4 +211,22 @@ fun extractFeatures(images: ArrayList<Mat?>,
         descriptors.add(roiDescriptors);
         keypoints.add(ROIkeypoints);
     }
+}
+
+fun computeSimilarity(queryDescriptors: Mat, objectDescriptors: Mat,
+normType: Int = NORM_HAMMING, ratio: Double = 0.75, crossCheck: Boolean = false): Double
+{
+    var matches = arrayListOf<MatOfDMatch>()
+    var matcher = BFMatcher.create(normType, crossCheck);
+    matcher.knnMatch(queryDescriptors, objectDescriptors, matches, 2);
+
+    var goodMatches = ArrayList<DMatch>()
+    for (match in matches)
+    {
+        if (match.toList()[0].distance < ratio * match.toList()[1].distance)
+        {
+            goodMatches.add(match.toList()[0])
+        }
+    }
+    return goodMatches.size.toDouble() /  matches.size.toDouble()
 }

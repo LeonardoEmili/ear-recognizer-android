@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
+import com.getchlabs.earrecognizer.recognition.addTemplate
+import com.getchlabs.earrecognizer.recognition.getDescriptor
 import com.getchlabs.earrecognizer.recognition.recognize
 import java.io.BufferedInputStream
 import java.io.InputStream
@@ -20,6 +20,7 @@ class EnrollementActivity : AppCompatActivity() {
 
     private lateinit var btnPickImage: Button
     private lateinit var imgEar: ImageView
+    private lateinit var tvName: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class EnrollementActivity : AppCompatActivity() {
         btnPickImage = findViewById(R.id.btn_pick_image)
         btnPickImage.setOnClickListener { pickImage() }
         imgEar = findViewById(R.id.img_ear)
+        tvName = findViewById(R.id.tv_name)
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -72,7 +74,14 @@ class EnrollementActivity : AppCompatActivity() {
             val bmp = BitmapFactory.decodeStream(bufferedInputStream);
 
 
-            imgEar.setImageBitmap(recognize(bmp, this))
+            //imgEar.setImageBitmap(recognize(bmp, this))
+            var descriptor = getDescriptor(bmp, this)
+            if (descriptor != null) {
+                addTemplate(this, tvName.text.toString(), descriptor)
+            } else {
+                Toast.makeText(this, "Invalid", Toast.LENGTH_LONG).show()
+
+            }
 
         }
     }

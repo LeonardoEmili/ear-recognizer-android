@@ -263,7 +263,14 @@ matches over the total number of matches.
 
 \section{Evaluation phase}
 
-\blindtext
+For the evaluation phase, we measured the performances of our model on the AMI dataset on the verification
+all-vs-all test. In this setup, an input probe is provided with its claimed identity, and only the matches
+with templates of the provided identity are considered. The test has a positive outcome if the similarity
+score with any template belonging to the claimed identity is above the acceptance threshold, otherwise the
+test has a negative outcome. Hence we are considering the multiple-template setting for evaluating our system.
+It's worth noting that having multiple templates per subject in the gallery allows getting higher values for
+Genuine Acceptance Rate (GAR) but also for False Acceptance Rate (FAR) since we are increasing the chance
+for an impostor to be wrongly identified with the claimed identity. 
 
 \begin{figure}[H]
     \label{fig:roc}

@@ -31,6 +31,10 @@ fun recognize(bmp: Bitmap, context: Context): Bitmap? {
     alignImages(processedROI2, paddingPercentages2, landmarks);
 
 
+    var descriptors = arrayListOf<Mat?>()
+    extractFeatures(processedROI2, descriptors)
+
+    //println(descriptors[0])
 
     return matToBitmap(processedROI2[0][0]!!)
 

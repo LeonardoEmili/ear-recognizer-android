@@ -49,7 +49,7 @@ by state-of-the-art solutions.
 
 We conducted our experiments using the Mathematical Analysis of Images (AMI) Ear Database \cite{ami}: it consists
 of a collection of 700 2D images acquired from 100 different subjects in an indoor environment.
-Images show a high degree of variability since they represent ears of subjects in the range of 19-65 ears
+Images show a high degree of variability since they represent ears of subjects in the range of 19-65 years
 taken from multiple points of view. Since all of the images come shipped with the identifier of the subject
 they belong to, we have been able to evaluate our work against it and draw some considerations
 about the final performances.
@@ -61,7 +61,7 @@ contains ear shapes or not and for localizing their position within the image. T
 about portions of the original image containing ears while discarding other irrelevant information.
 From now on, we will refer to these portions with the term of Region of Interest (ROI), denoting the bounding
 box surrounding the ear zone. Our goal is to build a detection module that is robust enough to rotations,
-translations, viewpoint, and scale changes. The reason is that images may not be perfect and the ear region
+translations, viewpoint, and scale changes. The reason is that images might not be perfect and the ear region
 not perfectly centered, but we want to be able to extract valid ROI no matter their position in the original
 image. To this aim, we relied on Viola-Jones Haar Feature-based Cascade Classifiers \cite{conf/cvpr/ViolaJ01}
 to detect valid ROI.
@@ -69,7 +69,7 @@ The algorithm works by combining the power of Haar-like features to useful extra
 image (e.g. presence of edges or straight lines) with the concept of integral images to speed up computations.
 The AdaBoost algorithm is responsible for the training procedure which selects a subset of meaningful features
 from the original set of features. Finally, a sequence of gradually stronger classifiers is applied over the
-input image to detect if it contains an ear shape. If at any stage, the decision is negative then the considered
+input image to detect if it contains an ear shape. If, at any stage, the decision is negative then the considered
 window is discarded without any further processing.
 
 \begin{figure}[h]
@@ -113,7 +113,8 @@ grayscale images and resized into a fixed size for the next steps.
 
 In this phase, we explored some of the most common approaches when extracting points
 of interest (i.e. landmarks). We first experimented using a state-of-the-art convolutional neural network
-(CNN) from the work of Hansley et al. that was specifically trained on this task and it performed quite well.
+(CNN) from the work of Hansley et al. \cite{iet:/content/journals/10.1049/iet-bmt.2017.0210}
+that was specifically trained on this task and it performed quite well.
 
 \begin{figure}[h]
     \label{fig:landmark}
@@ -149,13 +150,13 @@ we expect the resulting set of keypoints to be different from each other.
 We can see how the set of landmarks produced by the ORB algorithm is much more widespread around the
 center of the ear and does not necessarily follow the ear shape. However, we thought we could improve the
 results achieved using ORB by doing some considerations about the distribution of our data. We know that the ear
-region contains many meaningful key points that will later be used when matching incoming probes with templates
-belonging to enrolled subjects. If we inspect how these points are distributed we can clearly distinguish some
+region contains many meaningful keypoints that will later be used when matching incoming probes with templates
+belonging to enrolled subjects. If we inspect how these points are distributed, we can clearly distinguish some
 outliers (e.g. in the hair region) from the rest of the points that are concentrated around the center of the ear.
-Hence, we decided to apply data reduction to our set of landmarks $X$ and only to retain those points that
+Hence, we decided to apply data reduction to our set of landmarks $X$ and to only retain those points that
 satisfy the following condition:
 
-$$ d(x_i, \mu_X) <= l * \sigma_X $$
+$$ d(x_i, \mu_X) <= l * \sigma_X \quad \quad , \forall x_i \in X $$
 
 where $d(x_i,x_j)$ is the Euclidean distance bewteen $x_i$ and $x_j$, $\mu_X$ and $\sigma_X$ are respectively the
 centroid and the standard deviation of our set of points, and $l$ can be seen as a factor that controls how strictly
@@ -183,7 +184,7 @@ in the beginning, we said that we want a recognition system capable of identifyi
 input probe is not perfectly centered and aligned. In order to do that, we explored a few techniques to
 estimate the initial orientation of the image and we finally opted for regression. The idea is simple, if
 we look at the ear shape, we can observe that it is stretched along one direction, and more interesting,
-key points naturally tend to follow this direction. In these terms, we got a formulation for a linear
+keypoints naturally tend to follow this direction. In these terms, we got a formulation for a linear
 regression problem where the goal is to find the line that better approximates a given set of points
 (i.e. the landmarks). We did it and got some unexpected results:
 
@@ -199,19 +200,19 @@ regression problem where the goal is to find the line that better approximates a
 As we can see, the idea of using linear regression for estimating the initial image orientation
 provides us a reliable way of computing the angle $\theta$ between that line and the vertical line
 that we use as a reference for our orientation system. By doing so, we are able to align all of the
-images according to the compute angle, allowing a fair comparison when later we need to match the input
+images according to the computed angle, allowing a fair comparison when later we need to match the input
 probe with gallery templates. 
 Again, we want to precise that the set of detected landmarks produced by the two algorithms
 is not the same, hence the alignment step, which is based on it, can be different choosing a
 different algorithm. However, we found it interesting to see that our idea of applying linear
-regression on the set of key points can be applied in both cases.
+regression on the set of keypoints can be applied in both cases.
 It's worth noting that rotating an image by a given angle gives us a larger
 output image than the original one. In fact, with the rotation we discovered two main issues: the size
 of the output image depends on the value of $\theta$ and the areas of the output image corresponding to
 the corners need to be filled with some value in order to be matched with other images. The first issue
 tells us that when later we will match an input probe with gallery templates, their size once processed
 may be different. On the other hand, the latter happens because we consider the corners of the original
-image to be part of the rotated one, but if we look closer at Figure \ref{fig:padding_detection} we can see
+image to be part of the rotated one, but if we look closer at Figure 2 we can see
 that they designate a
 portion of the detected ROI that does not necessarily contain useful information for our matching purposes.
 
@@ -245,19 +246,19 @@ by applying cropping with a value of zoom that is proportional to the applied pa
 
 It is a vital phase since we care about representing points of interest in a feature descriptor no matter
 where these features are present in our image. In other words, we want to able to extract ear features
-even if they appear translated in the original image, then when we perform the matching between descriptors
+even if they appear translated in the original image. Then, when we perform the matching between descriptors,
 they should be designed in a way such that they are invariant to such geometric transformations.
 For these reasons, we have chosen to rely on the ORB algorithm for the feature extraction task too.
-In particular, we found it useful to have a compact feature vector for each detected key point but also
+In particular, we found it useful to have a compact feature vector for each detected keypoint but also
 because it allowed us to experiment with a few configurations of the algorithm in order to get the best
 results. We experimentally found that using $edgeThreshold=10$ in conjunction with the previous technique
 to reduce the points sparsity, allowed us to get a good set of points on the ear shape.
 Finally, we performed feature descriptor matching using the $BFMatcher$ that is essentially a brute force
-matcher that takes every descriptor in the first and matches it with all the descriptors in the second set.
+matcher that takes every descriptor and matches it with all the descriptors in the target set.
 Once the matching operation is completed, we have a way of measuring distances between the set of descriptors
 of the probe image with respect to the current template in the gallery. To reject poor matches and to obtain
 a single similarity score, we relied on the ratio test proposed by Lowe et al. \cite{Lowe:2004:DIF:993451.996342}
-using a value for $ratio=0.75$, then the similarity between two sets of descriptors is the ratio between good
+using a value for $ratio=0.75$. Then, the similarity between two sets of descriptors is the ratio between good
 matches over the total number of matches.
 
 \section{Evaluation phase}
@@ -308,19 +309,27 @@ the first step is ROI detection using Haar Feature-based Cascade Classifiers, th
 padding is applied over the obtained area, landmark detection is performed to allow automatic image orientation
 along the vertical axis, and finally, the image is rotated according to the computed angle and zoomed in using
 the idea which was previously described.
-Furthermore, the app allows performing either verification or identification using their dedicated sections.
+Furthermore, the app allows performing either verification or identification by accessing to their dedicated sections.
 For the verification task, the user simply declares his claimed identity and selects an image either from the phone
 gallery or by taking a photo and submits it to the system. The system will return a decision that is accepted if the
 similarity score of the probe image with any of the user templates in the gallery is above the acceptance threshold
-or rejected otherwise. On the other hand, the identification tasks will look for matches with any template in the
+or rejected otherwise. On the other hand, the identification task will look for matches with any template in the
 gallery, check if any template in the gallery generates an alarm for the given input probe, and finally return
-the identity associated to the template with the highest similarity score if it is above the considered acceptance
-threshold as well as the similarity score.
+the identity associated to the template with the highest similarity score, if it is above the considered acceptance
+threshold, as well as the similarity score.
 Moreover, for what concerns the gallery organization we decided to leverage the Android filesystem scheme and
 store each template as an individual file named with the id of the corresponding identity. This simple organizational
 scheme allows templates to be quickly retrieved whenever necessary and improves project modularity. All the files that
-are required for the application to work are shipped with it as bundle files and can be retrieved by using
-Android File System API. 
+are required by the application are shipped with it as bundle files and can be retrieved by using the
+Android File System API.
+
+\begin{figure}[H]
+    \label{fig:det}
+    \begin{center}
+        \includegraphics[width=8cm,keepaspectratio]{images/screen_android.jpeg}
+        \caption{Screenshot of the main page of the Android application.}
+    \end{center}
+\end{figure}
 
 \section{External resources}
 
@@ -332,7 +341,7 @@ developed during it.
 \begin{itemize}
     \item Left and right ear Haar feature-based cascade classifiers from
         the
-        \href{https://github.com/DiUS/Physiognomy/tree/master/python/haarcascades}{\emph{official GitHub OpenCV repository}}
+        \href{https://github.com/opencv/opencv/tree/e33bfb5ebfcf51b5f15995c08fd68a6b2ecb2f1e/data/haarcascades}{\emph{official GitHub OpenCV repository}}
         or from
         \href{https://github.com/DiUS/Physiognomy/tree/master/python/haarcascades}{\emph{this repository}}.
     \item First stage landmark detector using a CNN from

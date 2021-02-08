@@ -2,7 +2,7 @@
 
 \usepackage{url}
 \usepackage{graphicx}
-\usepackage{babel,blindtext}
+\usepackage{babel}
 \usepackage{float}
 \usepackage{hyperref}
 \hypersetup{
@@ -284,7 +284,23 @@ The first step of the evaluation process has been calculating the GAR and FAR sc
 In fact, these two were crucial for the plotting of several system performance charts. 
 The GAR score is defined as the ratio between the number of genuine acceptances and the 
 number of genuine attempts while the FAR is the ratio between the number of impostor 
-acceptances and the number of impostor attempts.\\
+acceptances and the number of impostor attempts.
+This has been done by testing every possible probe in the dataset with its identity in the gallery
+(in the case of GAR), and with the other identities in the gallery (in the case of FAR).
+Then, the False Rejection Rate (FRR) has been calculated subtracting 1 from GAR.
+Using these metrics it has been possible to plot several curves. The first one has been 
+the ROC (Receiver Operating 
+Characteristic) curve. The ROC curve is obtained placing the FAR score on the x-axis and
+ the GAR (1-FRR) score on the y-axis.
+It is the result of the calculations of these scores with many different threshold values. 
+In fact, having a distance threshold set to the maximum (1), both scores are maximized to 1, 
+because all attempts are accepted. On the other hand, setting the distance threshold to the 
+minimum (0), they are both minimized to 0 since no verification attempt is accepted.
+The result obtained is fairly good. The FAR score is null for small distance thresholds,
+going from around 0.5 down, while the GAR score is decently high for many threshold values.
+Furthermore, it is worth noticing that the scores obtained using the CNN approach are only
+slightly better than the ones obtained using our landmarks. 
+
 
 \begin{figure}[H]
     \label{fig:det}
@@ -294,7 +310,12 @@ acceptances and the number of impostor attempts.\\
     \end{center}
 \end{figure}
 
-\blindtext
+The second curve that has been observed is the DET (Detection Error TradeOff) curve. It is 
+used to express the probability of False Rejects (FRR) of the given system against
+the False Acceptances (FAR). In order to make it clearer to analyze, it is plotted on a 
+logarithmic scale. This curve allows us to see the rate of decrease of the False Rejection
+Rate with the increase of the False Acceptance Rate. Even in this case, the CNN technique
+has not demonstrated significant improvements compared to our own procedure.
 
 \begin{figure}[H]
     \label{fig:eer}
@@ -304,7 +325,23 @@ acceptances and the number of impostor attempts.\\
     \end{center}
 \end{figure}
 
-\blindtext
+Then, it has been the turn of the Equal Error Rate (EER) chart. It is needed to understand what
+is the threshold for which the False Rejection Rate and the False Acceptance Rate are equal. 
+This insight is very meaningful since it makes it possible to understand what is the right
+compromise between accepting impostors and rejecting genuine individuals. Given this value,
+it can be decided how to set the threshold depending on how severe could a false acceptance
+be for the system and how uncomfortable could a false rejection be for it. So, if this system
+needed to prevent impostors at all costs the threshold should be set where FAR is very low or 
+null. On the other hand, if it is more important to allow genuine users, it is advisable to set
+the threshold where the FRR is minimized. In this case, the EER is about 25\% and is positioned 
+where the threshold is around 0.93. So, it can be seen that impostors are only admitted with very
+high threshold values and the FAR suddenly decreases as the threshold lowers.
+For very low threshold values, very few attempts are accepted, so even genuine acceptances are
+not many and the FRR is close to its maximum. Then, for a threshold higher than 0.5, FRR goes 
+below 50\% and so the GAR grows consistently, allowing many genuine users into the system. 
+A threshold that is positioned around 0.9 is considered a good compromise for the system. In fact,
+it would only admit about 5\% of the impostors and 50\% of the genuine users. So a genuine user
+might need to try several attempts to enter the system, but an impostor is usually blocked.
 
 \section{Android porting}
 

@@ -57,7 +57,7 @@ fun addTemplate(context: Context, identity: String, template: Mat) {
 }
 
 fun verifyIdentity(context: Context, identity: String, probe: Mat,
-                   threshold: Double = 0.50): Boolean {
+                   threshold: Double = 0.88): Boolean {
     var map: HashMap<String, ArrayList<Mat>>? = readGallery(context)
     if (map == null) {
         return false
@@ -81,11 +81,18 @@ fun readGallery(context: Context): HashMap<String, ArrayList<Mat>>? {
         return null
     }
 
+
     var gson = GsonBuilder().create()
-    val type = object : TypeToken<HashMap<String, ArrayList<Mat>>>() {}.type
+    val type = object : TypeToken<HashMap<String, ArrayList<String>>>() {}.type
     val br =  BufferedReader(FileReader(file))
-    val map = gson.fromJson<HashMap<String, ArrayList<Mat>>>(br, type)
-    return map
+    val stringMap = gson.fromJson<HashMap<String, ArrayList<String>>>(br, type)
+    var ret = hashMapOf<String, ArrayList<Mat>>()
+    for (key in stringMap.keys) {
+        var arrayList = arrayListOf<Mat>()
+        stringMap[key]!!.forEach { arrayList.add(matFromJson(it)!!) }
+        ret[key] = arrayList
+    }
+    return ret
 }
 
 fun writeGallery(context: Context, map: Map<String, ArrayList<Mat>>) {
@@ -95,8 +102,15 @@ fun writeGallery(context: Context, map: Map<String, ArrayList<Mat>>) {
         file.createNewFile()
     }
 
+    val stringMap = hashMapOf<String, ArrayList<String>>()
+    for (key in map.keys) {
+        var arrayList = arrayListOf<String>()
+        map[key]!!.forEach { arrayList.add(matToJson(it)!!) }
+        stringMap[key] = arrayList
+    }
+
     var gson = GsonBuilder().create()
-    val text = gson.toJson(map)
+    val text = gson.toJson(stringMap)
 
     try {
         val outputStreamWriter = FileOutputStream(file)

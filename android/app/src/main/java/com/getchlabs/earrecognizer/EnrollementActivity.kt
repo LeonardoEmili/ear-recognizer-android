@@ -66,6 +66,9 @@ class EnrollementActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (data == null || data.data == null) {
+            return
+        }
         if (requestCode == PICK_IMAGE) {
             //TODO: action
             Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()

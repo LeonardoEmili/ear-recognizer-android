@@ -10,6 +10,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <chrono>
+#include "descriptors.hpp"
 
 using namespace cv;
 using namespace std;
@@ -43,3 +44,5 @@ Point2d computeCentroid(vector<Point2d> points);
 void computeMeanAndStd(vector<double> values, double &mean, double &std);
 
 bool equalMats(Mat a, Mat b);
+
+void evaluate();

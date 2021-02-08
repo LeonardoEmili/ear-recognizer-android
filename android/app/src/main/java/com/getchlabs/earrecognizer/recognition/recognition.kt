@@ -1,6 +1,5 @@
 package com.getchlabs.earrecognizer.recognition
 
-import android.R.attr.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
@@ -114,8 +113,15 @@ fun writeGallery(context: Context, map: Map<String, ArrayList<Mat>>) {
  */
 fun getDescriptor(bmp: Bitmap, context: Context): Mat? {
 
+    val aspectRatio: Float = bmp.getWidth() /
+            bmp.getHeight().toFloat()
+    val width = 400
+    val height = Math.round(width / aspectRatio)
 
-    var mat = bitmapToMat(bmp)
+    var resized = Bitmap.createScaledBitmap(
+            bmp, width, height, false)
+
+    var mat = bitmapToMat(resized)
     var image = arrayListOf<Mat?>(mat)
 
     var ROI = arrayListOf<Rect>()

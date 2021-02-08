@@ -280,7 +280,11 @@ for an impostor to be wrongly identified with the claimed identity.
     \end{center}
 \end{figure}
 
-\blindtext
+The first step of the evaluation process has been calculating the GAR and FAR scores. 
+In fact, these two were crucial for the plotting of several system performance charts. 
+The GAR score is defined as the ratio between the number of genuine acceptances and the 
+number of genuine attempts while the FAR is the ratio between the number of impostor 
+acceptances and the number of impostor attempts.\\
 
 \begin{figure}[H]
     \label{fig:det}
@@ -361,7 +365,7 @@ This project started with the idea of integrating a distributed database into th
 enrolled users test verification and identification by submitting their probes with any Android device. Due to
 the lack of time, we decided to focus more on the details of the design and implementation of the recognition
 process and opted to store locally the gallery in the user's phone. An interesting possibility for this project
-would be to integrate such distributed database, for instance using Google Cloud Firestore, to store user templates.
+would be to integrate such distributed storage, for instance using Google Cloud Storage, to store user templates.
 Moreover, we explored multiple approaches for implementing a proper recognition pipeline and a possibility would be
 to apply more advanced techniques for landmark detection and feature extraction, for instance training a dedicated
 CNN that would probably boost the recognition performances as we saw for the landmark detection phase.

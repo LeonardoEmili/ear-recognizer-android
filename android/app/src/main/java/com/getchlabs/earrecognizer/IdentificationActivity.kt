@@ -4,9 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
+import com.getchlabs.earrecognizer.recognition.addTemplate
 import com.getchlabs.earrecognizer.recognition.getDescriptor
 import com.getchlabs.earrecognizer.recognition.identify
 import com.getchlabs.earrecognizer.recognition.verifyIdentity
@@ -16,6 +15,8 @@ class IdentificationActivity : RecognitionActivity() {
 
     private lateinit var btnPickImage: Button
     private lateinit var btnOpenCamera: Button
+    private lateinit var checkTemplate : CheckBox
+    private lateinit var hintBox : TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +30,8 @@ class IdentificationActivity : RecognitionActivity() {
         btnPickImage.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_GALLERY) }
         btnOpenCamera = findViewById(R.id.btn_open_camera)
         btnOpenCamera.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_CAMERA) }
+        checkTemplate = findViewById(R.id.template_update)
+        hintBox = findViewById(R.id.msg_hint)
     }
 
 
@@ -40,24 +43,25 @@ class IdentificationActivity : RecognitionActivity() {
 
         intent ?: return
 
-
         var bmp = getBitmapFromIntent(this, requestCode, intent) ?: return
 
-        Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
-
+        //Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
 
         //imgEar.setImageBitmap(recognize(bmp, this))
         var descriptor = getDescriptor(bmp, this)
         if (descriptor != null) {
             var identity = identify(this, descriptor)
-            if (identity != null)
-                Toast.makeText(this, "Identity: " + identity, Toast.LENGTH_LONG).show()
-             else
-                Toast.makeText(this, "Impostor", Toast.LENGTH_LONG).show()
+            if (identity != null) {
+                if (checkTemplate.isChecked) {
+                    addTemplate(this, identity, descriptor)
+                    Toast.makeText(this, "Template succesfully updated", Toast.LENGTH_SHORT).show()
+                }
+                hintBox.text = "Welcome back: " + identity
+            } else
+                hintBox.text = "You shall not pass!"
 
         } else {
-            Toast.makeText(this, "Invalid template", Toast.LENGTH_LONG).show()
-
+            hintBox.text = "Invalid template"
         }
 
     }

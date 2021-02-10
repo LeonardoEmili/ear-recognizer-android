@@ -1,155 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:padding="10dp"
     android:background="#fcfcfc"
     android:gravity="center"
-    android:id="@+id/ll">
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".MainActivity">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:clipToPadding="false"
         android:gravity="center"
-        android:layout_marginTop="2dp"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
+
         <androidx.cardview.widget.CardView
-            android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/enrol_user"
-            android:clickable="true"
             android:layout_width="340dp"
             android:layout_height="150dp"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/circlebackgroundyellow"
-                    android:src="@drawable/ic_baseline_person_add_24"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:src="@drawable/ic_baseline_person_add_24" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
-                    android:text="Add user"/>
+                    android:text="Add user"
+                    android:textStyle="bold" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/lightgray"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@color/lightgray" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Register a new user"
                     android:padding="5dp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:text="Register a new user"
+                    android:textColor="@android:color/darker_gray" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:clipToPadding="false"
         android:gravity="center"
-        android:layout_marginTop="2dp"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
+
         <androidx.cardview.widget.CardView
-            android:foreground="?android:attr/selectableItemBackground"
-            android:clickable="true"
             android:id="@+id/verify_user"
             android:layout_width="340dp"
             android:layout_height="150dp"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/circlebackgroundgreen"
-                    android:src="@drawable/ic_baseline_verified_24"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:src="@drawable/ic_baseline_verified_24" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
-                    android:text="Verification"/>
+                    android:text="Verification"
+                    android:textStyle="bold" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/lightgray"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@color/lightgray" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Verify the claimed identity"
                     android:padding="5dp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:text="Verify the claimed identity"
+                    android:textColor="@android:color/darker_gray" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
+
         <androidx.cardview.widget.CardView
-            android:foreground="?android:attr/selectableItemBackground"
-            android:clickable="true"
             android:id="@+id/identify_user"
             android:layout_width="340dp"
             android:layout_height="150dp"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:layout_marginTop="2dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/circlebackgroundpink"
-                    android:src="@drawable/ic_baseline_person_search_24"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:src="@drawable/ic_baseline_person_search_24" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
-                    android:text="Identification"/>
+                    android:text="Identification"
+                    android:textStyle="bold" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/lightgray"
-                    android:layout_margin="10dp"/>
+                    android:layout_margin="10dp"
+                    android:background="@color/lightgray" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Identify a person"
                     android:padding="5dp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:text="Identify a person"
+                    android:textColor="@android:color/darker_gray" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>

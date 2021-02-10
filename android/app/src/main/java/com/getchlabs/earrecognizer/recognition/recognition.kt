@@ -3,6 +3,7 @@ package com.getchlabs.earrecognizer.recognition
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import org.opencv.core.Mat

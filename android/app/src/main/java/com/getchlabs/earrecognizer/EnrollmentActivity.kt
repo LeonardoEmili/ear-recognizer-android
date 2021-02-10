@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.getchlabs.earrecognizer.recognition.addTemplate
@@ -18,11 +19,9 @@ import java.io.InputStream
 
 class EnrollmentActivity : RecognitionActivity() {
 
-
-
-
     private lateinit var btnPickImage: Button
     private lateinit var btnOpenCamera: Button
+    private lateinit var hintBox : TextView
 
     //private lateinit var imgEar: ImageView
     private lateinit var tvName: EditText
@@ -37,8 +36,8 @@ class EnrollmentActivity : RecognitionActivity() {
         btnPickImage.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_GALLERY) }
         btnOpenCamera = findViewById(R.id.btn_open_camera)
         btnOpenCamera.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_CAMERA) }
-        //imgEar = findViewById(R.id.img_ear)
         tvName = findViewById(R.id.tv_name)
+        hintBox = findViewById(R.id.msg_hint)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -47,15 +46,15 @@ class EnrollmentActivity : RecognitionActivity() {
 
         var bmp = getBitmapFromIntent(this, requestCode, intent) ?: return
 
-        Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
 
         //imgEar.setImageBitmap(recognize(bmp, this))
         var descriptor = getDescriptor(bmp, this)
         if (descriptor != null) {
             addTemplate(this, tvName.text.toString(), descriptor)
-            Toast.makeText(this, "Successfully enrolled", Toast.LENGTH_SHORT).show()
+            hintBox.text = "User succesfully enrolled"
         } else {
-            Toast.makeText(this, "Invalid template", Toast.LENGTH_LONG).show()
+            hintBox.text = "Invalid template"
 
         }
 

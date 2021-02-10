@@ -20,6 +20,8 @@ class VerificationActivity : RecognitionActivity() {
     private lateinit var btnPickImage: Button
     private lateinit var btnOpenCamera: Button
     private lateinit var tvName: EditText
+    private lateinit var checkTemplate : CheckBox
+    private lateinit var hintBox : TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,13 +29,13 @@ class VerificationActivity : RecognitionActivity() {
         setContentView(R.layout.activity_verification)
         title = ("Verification")
 
-
-
         btnPickImage = findViewById(R.id.btn_pick_image)
         btnPickImage.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_GALLERY) }
         btnOpenCamera = findViewById(R.id.btn_open_camera)
         btnOpenCamera.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_CAMERA) }
         tvName = findViewById(R.id.tv_name)
+        checkTemplate = findViewById(R.id.template_update)
+        hintBox = findViewById(R.id.msg_hint)
     }
 
 
@@ -45,23 +47,28 @@ class VerificationActivity : RecognitionActivity() {
 
         intent ?: return
 
-
         var bmp = getBitmapFromIntent(this, requestCode, intent) ?: return
 
-        Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
-
+        //Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
 
         //imgEar.setImageBitmap(recognize(bmp, this))
         var descriptor = getDescriptor(bmp, this)
         if (descriptor != null) {
         if (verifyIdentity(this, tvName.text.toString(), descriptor)) {
-            Toast.makeText(this, "Genuine", Toast.LENGTH_LONG).show()
+            if (checkTemplate.isChecked) {
+                addTemplate(this, tvName.text.toString(), descriptor)
+                Toast.makeText(this, "Template succesfully updated", Toast.LENGTH_SHORT).show()
+            }
+            //Toast.makeText(this, "Genuine", Toast.LENGTH_LONG).show()
+            hintBox.text = "Genuine template submitted"
 
         } else {
-            Toast.makeText(this, "Impostor", Toast.LENGTH_LONG).show()
+            hintBox.text = "You shall not pass!"
+            //Toast.makeText(this, "Impostor", Toast.LENGTH_LONG).show()
 
         }
         } else {
+            hintBox.text = "Invalid template"
             Toast.makeText(this, "Invalid template", Toast.LENGTH_LONG).show()
 
         }

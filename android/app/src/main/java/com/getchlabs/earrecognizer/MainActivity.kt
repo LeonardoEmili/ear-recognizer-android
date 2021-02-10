@@ -17,11 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (OpenCVLoader.initDebug()) {
-            Toast.makeText(this, "OpenCV successfully loaded", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "OpenCV failed to load", Toast.LENGTH_SHORT).show();
-        }
+        OpenCVLoader.initDebug()
 
         btnEnrolUser = findViewById(R.id.enrol_user);
         btnEnrolUser.setOnClickListener { goToEnrollementActivity() };

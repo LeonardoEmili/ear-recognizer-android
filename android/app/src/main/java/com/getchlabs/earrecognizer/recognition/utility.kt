@@ -15,6 +15,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 
+val OPTIMAL_RECOGNITION_THRESHOLD = 0.88
 
 fun bitmapToMat(bmp: Bitmap): Mat {
     val mat = Mat()

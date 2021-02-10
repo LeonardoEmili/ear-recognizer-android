@@ -57,11 +57,8 @@ fun addTemplate(context: Context, identity: String, template: Mat) {
 }
 
 fun verifyIdentity(context: Context, identity: String, probe: Mat,
-                   threshold: Double = 0.88): Boolean {
-    var map: HashMap<String, ArrayList<Mat>>? = readGallery(context)
-    if (map == null) {
-        return false
-    }
+                   threshold: Double = OPTIMAL_RECOGNITION_THRESHOLD): Boolean {
+    var map: HashMap<String, ArrayList<Mat>> = readGallery(context) ?: return false
     if (!map.containsKey(identity)) {
         return false
     }
@@ -72,6 +69,25 @@ fun verifyIdentity(context: Context, identity: String, probe: Mat,
     }
 
     return false
+}
+
+fun identify(context: Context, probe: Mat,
+             threshold: Double = OPTIMAL_RECOGNITION_THRESHOLD): String? {
+
+    var map: HashMap<String, ArrayList<Mat>> = readGallery(context) ?: return null
+
+    var lowDistance = 1.1
+    var bestIdentity : String? = null
+    for (identity in map.keys) {
+        for (template in map[identity]!!) {
+            var distance = 1.0 - computeSimilarity(probe, template)
+            if (distance <= threshold && distance < lowDistance) {
+                lowDistance = distance
+                bestIdentity = identity
+            }
+        }
+    }
+    return bestIdentity
 }
 
 fun readGallery(context: Context): HashMap<String, ArrayList<Mat>>? {

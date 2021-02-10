@@ -17,7 +17,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Toast.makeText(this, OpenCVLoader.initDebug().toString(), Toast.LENGTH_LONG).show();
+        if (OpenCVLoader.initDebug()) {
+            Toast.makeText(this, "OpenCV successfully loaded", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "OpenCV failed to load", Toast.LENGTH_SHORT).show();
+        }
 
         btnEnrolUser = findViewById(R.id.enrol_user);
         btnEnrolUser.setOnClickListener { goToEnrollementActivity() };
@@ -28,17 +32,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToEnrollementActivity() {
-        Toast.makeText(this, "Open enrollement", Toast.LENGTH_LONG).show();
-        startActivity(Intent(this, EnrollementActivity::class.java))
+        //Toast.makeText(this, "Open enrollement", Toast.LENGTH_LONG).show();
+        startActivity(Intent(this, EnrollmentActivity::class.java))
     }
 
     fun goToVerificationActivity() {
-        Toast.makeText(this, "Open verification", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Open verification", Toast.LENGTH_LONG).show();
         startActivity(Intent(this, VerificationActivity::class.java))
     }
 
     fun goToIdentificationActivity() {
-        Toast.makeText(this, "Open identification", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Open identification", Toast.LENGTH_LONG).show();
         startActivity(Intent(this, IdentificationActivity::class.java))
     }
 }

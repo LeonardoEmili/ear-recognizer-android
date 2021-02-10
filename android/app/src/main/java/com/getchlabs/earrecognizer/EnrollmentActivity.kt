@@ -1,68 +1,69 @@
 package com.getchlabs.earrecognizer
 
+import android.R.attr
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
-import android.view.MenuItem
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.getchlabs.earrecognizer.recognition.addTemplate
 import com.getchlabs.earrecognizer.recognition.getDescriptor
-import com.getchlabs.earrecognizer.recognition.recognize
 import java.io.BufferedInputStream
 import java.io.InputStream
 
-class EnrollementActivity : AppCompatActivity() {
 
-    val PICK_IMAGE = 1
+class EnrollmentActivity : RecognitionActivity() {
+
+
+
 
     private lateinit var btnPickImage: Button
-    private lateinit var imgEar: ImageView
+    private lateinit var btnOpenCamera: Button
+
+    //private lateinit var imgEar: ImageView
     private lateinit var tvName: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enrollement)
+        title = ("Enrollment")
 
-        // calling the action bar
-        var actionBar = getSupportActionBar()
-
-        // showing the back button in action bar
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true)
-        }
 
         btnPickImage = findViewById(R.id.btn_pick_image)
-        btnPickImage.setOnClickListener { pickImage() }
-        imgEar = findViewById(R.id.img_ear)
+        btnPickImage.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_GALLERY) }
+        btnOpenCamera = findViewById(R.id.btn_open_camera)
+        btnOpenCamera.setOnClickListener { pickImage(this, PICK_IMAGE_FROM_CAMERA) }
+        //imgEar = findViewById(R.id.img_ear)
         tvName = findViewById(R.id.tv_name)
     }
 
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        Toast.makeText(this, item.itemId.toString(), Toast.LENGTH_LONG).show();
-        when (item.itemId) {
-                android.R.id.home -> {
-                finish()
-                return true
-            }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        intent ?: return
+
+        var bmp = getBitmapFromIntent(this, requestCode, intent) ?: return
+
+        Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
+
+        //imgEar.setImageBitmap(recognize(bmp, this))
+        var descriptor = getDescriptor(bmp, this)
+        if (descriptor != null) {
+            addTemplate(this, tvName.text.toString(), descriptor)
+            Toast.makeText(this, "Successfully enrolled", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Invalid template", Toast.LENGTH_LONG).show()
+
         }
-        return super.onContextItemSelected(item)
+
     }
 
-    fun pickImage() {
-        val getIntent = Intent(Intent.ACTION_GET_CONTENT)
-        getIntent.type = "image/*"
 
-        val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        pickIntent.type = "image/*"
 
-        val chooserIntent = Intent.createChooser(getIntent, "Select Image")
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-
-        startActivityForResult(chooserIntent, PICK_IMAGE)
-    }
+/*
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -70,7 +71,6 @@ class EnrollementActivity : AppCompatActivity() {
             return
         }
         if (requestCode == PICK_IMAGE) {
-            //TODO: action
             Toast.makeText(this, "Got the image", Toast.LENGTH_SHORT).show()
             val inputStream: InputStream? = getContentResolver().openInputStream(data?.data!!)
             val bufferedInputStream =  BufferedInputStream(inputStream);
@@ -81,12 +81,15 @@ class EnrollementActivity : AppCompatActivity() {
             var descriptor = getDescriptor(bmp, this)
             if (descriptor != null) {
                 addTemplate(this, tvName.text.toString(), descriptor)
+                Toast.makeText(this, "Successfully enrolled", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "Invalid", Toast.LENGTH_LONG).show()
 
             }
 
         }
-    }
+
+        }*/
+
 
 }

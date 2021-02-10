@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.getchlabs.earrecognizer"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+
 
     implementation 'com.google.code.gson:gson:2.8.6'
 

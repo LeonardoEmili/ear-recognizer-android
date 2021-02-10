@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text=""
-        android:hint="type identity id here"
+        android:hint="type identity id"
         android:gravity="center"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"

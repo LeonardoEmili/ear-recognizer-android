@@ -31,8 +31,8 @@ int f(int argc, char **argv) {
 
     cout << "\nApplying landmark detection ...\n" << flush;
     vector<vector<vector<Point2d>>> landmarks;
-    // extractFeatures(processedROI, landmarks, imageNames);
-    detectLandmark(processedROI, landmarks, imageNames);
+    extractFeatures(processedROI, landmarks, imageNames);
+    // detectLandmark(processedROI, landmarks, imageNames);
 
     cout << "\nAuto-aligning images ...\n" << flush;
     alignImages(processedROI, paddingPercentages, landmarks, imageNames);

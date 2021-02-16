@@ -17,10 +17,16 @@
         android:theme="@style/Theme.EarRecognizer">
 
 
-        <activity android:name=".IdentificationActivity"></activity>
-        <activity android:name=".VerificationActivity" />
-        <activity android:name=".EnrollmentActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".IdentificationActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".VerificationActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".EnrollmentActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

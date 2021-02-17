@@ -1,5 +1,5 @@
 # Ear-Recognizer-Android
-Ear recognition system leveraging Android camera for online identification of enrolled subjects.
+Ear recognition system leveraging Android camera and OpenCV for online verification and identification of enrolled subjects.
 
 ## Datasets
 - [AMI Ear Database](https://ctim.ulpgc.es/research_works/ami_ear_database/)

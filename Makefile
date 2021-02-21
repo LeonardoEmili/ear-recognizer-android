@@ -1,6 +1,7 @@
 .PHONY: all build run-ami ami run-evaluation runa
 
 # Default haarcascades installation path, provide a custom value with OPENCV_SAMPLES_DATA_PATH=<custom_path> if different
+# Example usage: `make run-ami OPENCV_SAMPLES_DATA_PATH=/path_to_opencv/data/haarcascades`
 export OPENCV_SAMPLES_DATA_PATH=${HOME}/opencv/data/haarcascades/
 
 all:
@@ -53,6 +54,3 @@ run-ami:
 run-evaluation:
 	@make build > /dev/null
 	@./build/GalleryGenerator datasets/AMI/ "evaluation"
-
-runa:
-	@make run-ami OPENCV_SAMPLES_DATA_PATH=/usr/local/Cellar/opencv/4.5.0_5/share/opencv4/haarcascades

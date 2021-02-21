@@ -5,12 +5,12 @@ Ear recognition system leveraging Android camera and OpenCV for online verificat
 <table>
   <tr style align="center"><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td><td>(6)</td></tr>
   <tr align="center">
-    <td><img src="report/images/detection_example1.jpg" height="100px" width="80px"/></td>
-    <td><img src="report/images/detection_padding_example1.jpg" height="100px" width="80px"/></td>
-    <td><img src="report/images/landmark_orb_example1.jpg" height="80px" width="80px" style="padding-top:15px; padding-bottom: 15px"/></td>
-    <td><img src="report/images/landmark_orb_reduced_example1.jpg" height="80px" width="80px" style="padding-top:15px; padding-bottom: 15px"/></td>
-    <td><img src="report/images/rotation2_crop.jpeg" height="80px" width="80px" style="padding-top:15px; padding-bottom: 15px"/></td>
-    <td><img src="report/images/rotation2_after_crop.jpeg" height="80px" width="80px" style="padding-top:15px; padding-bottom: 15px"/></td>
+    <td><img src="report/images/detection_example1.jpg" height="110px" width="90px"/></td>
+    <td><img src="report/images/detection_padding_example1.jpg" height="110px" width="90px"/></td>
+    <td><img src="report/images/landmark_orb_example1.jpg" height="90px" width="90px" style="padding-top:10px; padding-bottom: 10px"/></td>
+    <td><img src="report/images/landmark_orb_reduced_example1.jpg" height="90px" width="90px" style="padding-top:10px; padding-bottom: 10px"/></td>
+    <td><img src="report/images/rotation2_crop.jpeg" height="90px" width="90px" style="padding-top:10px; padding-bottom: 10px"/></td>
+    <td><img src="report/images/rotation2_after_crop.jpeg" height="90px" width="90px" style="padding-top:10px; padding-bottom: 10px"/></td>
   </tr>
 </table>
 

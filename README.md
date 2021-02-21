@@ -1,7 +1,7 @@
 # Ear-Recognizer-Android
 Ear recognition system leveraging Android camera and OpenCV for online verification and identification of enrolled subjects.
 
-# Recognition pipeline
+## Recognition pipeline
 <table>
   <tr style align="center"><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td><td>(6)</td></tr>
   <tr align="center">

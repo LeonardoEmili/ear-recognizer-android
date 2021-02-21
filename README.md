@@ -22,6 +22,9 @@ Ear recognition system leveraging Android camera and OpenCV for online verificat
 6. Align the image according to the correct angle and apply the zoom trick
 7. Extract image descriptors and compute similarity scores with gallery templates
 
+## Interactive demo
+Download the [APK file](https://github.com/LeonardoEmili/ear-recognizer-android/releases/download/1.1/app-release.apk.zip) (about 120MB) and install it on your Android device for an interactive demo.
+
 ## Datasets
 - [AMI Ear Database](https://ctim.ulpgc.es/research_works/ami_ear_database/)
 
